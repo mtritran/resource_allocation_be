@@ -292,9 +292,9 @@ Làm trước vì mọi module sau đều phụ thuộc vào phần này.
 
 ## Phase 7 — AI Bonus Features
 
-- [ ] `ai/AiRecommendationService.java` — gọi `ReportService.getAvailable()` lấy số liệu thật → build prompt → gọi AI model format câu trả lời (xem lưu ý ở `api-specs.md` mục 5.1, không để AI tự bịa số)
-- [ ] `ai/AiController.java` — `/ai/recommend`, `/ai/risk-detection`
-- [ ] Test thủ công với vài query mẫu trong spec gốc
+- [x] `ai/AiRecommendationService.java` — gọi `ReportService.getAvailable()` lấy số liệu thật → build prompt → gọi AI model format câu trả lời (xem lưu ý ở `api-specs.md` mục 5.1, không để AI tự bịa số)
+- [x] `ai/AiController.java` — `/ai/recommend`, `/ai/risk-detection`
+- [x] Test thủ công với vài query mẫu trong spec gốc
 
 **Deliverable:** 2 endpoint AI hoạt động, số liệu khớp với report thật.
 

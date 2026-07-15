@@ -1,5 +1,6 @@
 package com.company.resourceallocation.core.project;
 
+import com.company.resourceallocation.core.allocation.AllocationRepository;
 import com.company.resourceallocation.core.project.dto.ProjectRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,8 +30,12 @@ public class ProjectControllerTest {
     @Autowired
     ProjectRepository projectRepository;
 
+    @Autowired
+    AllocationRepository allocationRepository;
+
     @BeforeEach
     void cleanUp() {
+        allocationRepository.deleteAll();
         projectRepository.deleteAll();
     }
 
