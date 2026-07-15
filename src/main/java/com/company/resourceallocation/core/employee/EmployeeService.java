@@ -2,6 +2,8 @@ package com.company.resourceallocation.core.employee;
 
 import com.company.resourceallocation.core.employee.dto.EmployeeRequest;
 import com.company.resourceallocation.core.employee.dto.EmployeeResponse;
+import com.company.resourceallocation.core.employee.dto.WorkloadResponse;
+import com.company.resourceallocation.core.allocation.Allocation;
 import com.company.resourceallocation.core.allocation.AllocationRepository;
 import com.company.resourceallocation.exception.DuplicateResourceException;
 import com.company.resourceallocation.exception.EmployeeInUseException;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -77,5 +80,27 @@ public class EmployeeService {
         }
         
         employeeRepository.delete(employee);
+    }
+
+    @Transactional(readOnly = true)
+    public WorkloadResponse getEmployeeWorkload(Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
+
+        List<Allocation> allocations = allocationRepository.findByEmployeeEmployeeId(id);
+        int totalAllocation = allocations.stream().mapToInt(Allocation::getAllocationPercent).sum();
+        int available = 100 - totalAllocation;
+
+        List<WorkloadResponse.AllocationBreakdown> breakdown = allocations.stream()
+                .map(a -> new WorkloadResponse.AllocationBreakdown(a.getProject().getProjectCode(), a.getAllocationPercent()))
+                .toList();
+
+        return WorkloadResponse.builder()
+                .employeeId(employee.getEmployeeId())
+                .employeeName(employee.getFullName())
+                .totalAllocation(totalAllocation)
+                .available(available)
+                .allocations(breakdown)
+                .build();
     }
 }

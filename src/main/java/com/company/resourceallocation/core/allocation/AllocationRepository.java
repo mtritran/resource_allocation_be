@@ -6,7 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface AllocationRepository extends JpaRepository<Allocation, Long> {
+
+    List<Allocation> findByEmployeeEmployeeId(Long employeeId);
 
     @Query("SELECT COALESCE(SUM(a.allocationPercent), 0) FROM Allocation a WHERE a.employee.employeeId = :employeeId AND a.allocationId <> :excludeId")
     Integer sumAllocationByEmployeeExcluding(@Param("employeeId") Long employeeId, @Param("excludeId") Long excludeId);

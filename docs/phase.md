@@ -272,8 +272,8 @@ Làm trước vì mọi module sau đều phụ thuộc vào phần này.
 
 ## Phase 5 — Employee Workload Endpoint
 
-- [ ] Bổ sung `GET /employees/{id}/workload` vào `EmployeeController` (theo `api-specs.md` mục 1.6) — cần `AllocationRepository` nên để sau Phase 4.
-- [ ] `WorkloadResponse` DTO.
+- [x] Bổ sung `GET /employees/{id}/workload` vào `EmployeeController` (theo `api-specs.md` mục 1.6) — cần `AllocationRepository` nên để sau Phase 4.
+- [x] `WorkloadResponse` DTO.
 
 **Deliverable:** Endpoint workload trả đúng `totalAllocation`, `available`, breakdown theo project.
 

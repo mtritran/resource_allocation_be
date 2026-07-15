@@ -1,5 +1,9 @@
 package com.company.resourceallocation.core.employee;
 
+import com.company.resourceallocation.core.project.Project;
+import com.company.resourceallocation.core.project.ProjectRepository;
+import com.company.resourceallocation.core.allocation.Allocation;
+import com.company.resourceallocation.core.allocation.AllocationRepository;
 import com.company.resourceallocation.core.employee.dto.EmployeeRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,9 +32,17 @@ public class EmployeeControllerTest {
     @Autowired
     EmployeeRepository employeeRepository;
 
+    @Autowired
+    ProjectRepository projectRepository;
+
+    @Autowired
+    AllocationRepository allocationRepository;
+
     @BeforeEach
     void cleanUp() {
+        allocationRepository.deleteAll();
         employeeRepository.deleteAll();
+        projectRepository.deleteAll();
     }
 
     @Test
@@ -126,5 +138,71 @@ public class EmployeeControllerTest {
 
         mockMvc.perform(get("/api/v1/employees/" + emp.getEmployeeId()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void should_returnEmployeeWorkloadWithBreakdown_when_employeeHasAllocations() throws Exception {
+        Employee emp = Employee.builder()
+                .employeeCode("EMP_WL_1")
+                .fullName("Tuan Ho Anh")
+                .email("tuanwl@test.com")
+                .role("Dev")
+                .build();
+        emp = employeeRepository.save(emp);
+
+        Project prj1 = Project.builder()
+                .projectCode("NCG")
+                .projectName("New Core")
+                .status(com.company.resourceallocation.core.project.ProjectStatus.ACTIVE)
+                .build();
+        prj1 = projectRepository.save(prj1);
+
+        Project prj2 = Project.builder()
+                .projectCode("GRID")
+                .projectName("Grid System")
+                .status(com.company.resourceallocation.core.project.ProjectStatus.ACTIVE)
+                .build();
+        prj2 = projectRepository.save(prj2);
+
+        Allocation alc1 = Allocation.builder()
+                .employee(emp)
+                .project(prj1)
+                .allocationPercent(60)
+                .build();
+        allocationRepository.save(alc1);
+
+        Allocation alc2 = Allocation.builder()
+                .employee(emp)
+                .project(prj2)
+                .allocationPercent(20)
+                .build();
+        allocationRepository.save(alc2);
+
+        mockMvc.perform(get("/api/v1/employees/" + emp.getEmployeeId() + "/workload"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.employeeId").value(emp.getEmployeeId()))
+                .andExpect(jsonPath("$.totalAllocation").value(80))
+                .andExpect(jsonPath("$.available").value(20))
+                .andExpect(jsonPath("$.allocations.length()").value(2))
+                .andExpect(jsonPath("$.allocations[0].projectCode").value("NCG"))
+                .andExpect(jsonPath("$.allocations[0].allocationPercent").value(60));
+    }
+
+    @Test
+    void should_returnZeroWorkload_when_employeeHasNoAllocations() throws Exception {
+        Employee emp = Employee.builder()
+                .employeeCode("EMP_WL_2")
+                .fullName("Nam")
+                .email("namwl@test.com")
+                .role("Dev")
+                .build();
+        emp = employeeRepository.save(emp);
+
+        mockMvc.perform(get("/api/v1/employees/" + emp.getEmployeeId() + "/workload"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.employeeId").value(emp.getEmployeeId()))
+                .andExpect(jsonPath("$.totalAllocation").value(0))
+                .andExpect(jsonPath("$.available").value(100))
+                .andExpect(jsonPath("$.allocations.length()").value(0));
     }
 }

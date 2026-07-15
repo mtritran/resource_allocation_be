@@ -2,6 +2,7 @@ package com.company.resourceallocation.core.employee;
 
 import com.company.resourceallocation.core.employee.dto.EmployeeRequest;
 import com.company.resourceallocation.core.employee.dto.EmployeeResponse;
+import com.company.resourceallocation.core.employee.dto.WorkloadResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -58,5 +59,12 @@ public class EmployeeController {
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/workload")
+    @Operation(summary = "Get Employee Workload")
+    public ResponseEntity<WorkloadResponse> getEmployeeWorkload(@PathVariable Long id) {
+        WorkloadResponse response = employeeService.getEmployeeWorkload(id);
+        return ResponseEntity.ok(response);
     }
 }
