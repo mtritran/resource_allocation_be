@@ -239,32 +239,32 @@ Làm trước vì mọi module sau đều phụ thuộc vào phần này.
 
 Đây là phase trọng tâm của cả hệ thống — chứa toàn bộ business rule phức tạp.
 
-- [ ] `Allocation.java` (Entity) — có FK tới `Employee`, `Project`
-- [ ] `AllocationRepository.java` — thêm custom query:
+- [x] `Allocation.java` (Entity) — có FK tới `Employee`, `Project`
+- [x] `AllocationRepository.java` — thêm custom query:
   ```java
   @Query("SELECT COALESCE(SUM(a.allocationPercent), 0) FROM Allocation a WHERE a.employee.id = :employeeId AND a.id <> :excludeId")
   Integer sumAllocationByEmployeeExcluding(Long employeeId, Long excludeId);
   ```
   (dùng chung cho cả create — truyền `excludeId = -1` hoặc overload method — và update, xem BR-ALC-02 Case A/B ở `business-rules.md`)
-- [ ] `dto/AllocationRequest.java`, `dto/AllocationResponse.java`
-- [ ] `AllocationMapper.java`
-- [ ] `exception/AllocationExceededException.java`, `InvalidProjectStatusException.java`, `InvalidAllocationPercentException.java`
-- [ ] Bổ sung handler cho 3 exception trên vào `GlobalExceptionHandler`
-- [ ] `AllocationService.java` — implement đầy đủ theo flow ở `architecture.md` mục 6:
+- [x] `dto/AllocationRequest.java`, `dto/AllocationResponse.java`
+- [x] `AllocationMapper.java`
+- [x] `exception/AllocationExceededException.java`, `InvalidProjectStatusException.java`, `InvalidAllocationPercentException.java`
+- [x] Bổ sung handler cho 3 exception trên vào `GlobalExceptionHandler`
+- [x] `AllocationService.java` — implement đầy đủ theo flow ở `architecture.md` mục 6:
   - BR-ALC-01: check percent 1-100
   - BR-ALC-02: check tổng ≤ 100% (Case A create, Case B update — **test kỹ case update**)
   - BR-ALC-03/BR-PRJ-03: check project không COMPLETED
   - BR-ALC-04: check employee/project tồn tại
   - BR-ALC-05: delete tự do
   - BR-ALC-06: check startDate/endDate
-- [ ] `AllocationController.java` — theo `api-specs.md` mục 3.1-3.5
-- [ ] Quay lại `EmployeeService`: bổ sung BR-EMP-03 (chặn xoá employee còn allocation active) — giờ đã có `AllocationRepository` để check
-- [ ] Test thủ công kỹ các case:
-  - [ ] Tạo allocation tổng đúng 100% → pass
-  - [ ] Tạo allocation tổng vượt 100% → reject đúng message
-  - [ ] Update allocation giảm % (case dễ sai nếu quên loại trừ record đang sửa) → phải pass
-  - [ ] Tạo allocation vào project COMPLETED → reject
-  - [ ] Xoá employee còn allocation active → reject
+- [x] `AllocationController.java` — theo `api-specs.md` mục 3.1-3.5
+- [x] Quay lại `EmployeeService`: bổ sung BR-EMP-03 (chặn xoá employee còn allocation active) — giờ đã có `AllocationRepository` để check
+- [x] Test thủ công kỹ các case:
+  - [x] Tạo allocation tổng đúng 100% → pass
+  - [x] Tạo allocation tổng vượt 100% → reject đúng message
+  - [x] Update allocation giảm % (case dễ sai nếu quên loại trừ record đang sửa) → phải pass
+  - [x] Tạo allocation vào project COMPLETED → reject
+  - [x] Xoá employee còn allocation active → reject
 
 **Deliverable:** Module Allocation hoàn chỉnh, pass toàn bộ test case ở `business-rules.md`.
 
