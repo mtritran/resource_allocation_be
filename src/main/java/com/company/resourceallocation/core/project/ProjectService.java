@@ -2,7 +2,9 @@ package com.company.resourceallocation.core.project;
 
 import com.company.resourceallocation.core.project.dto.ProjectRequest;
 import com.company.resourceallocation.core.project.dto.ProjectResponse;
+import com.company.resourceallocation.core.allocation.AllocationRepository;
 import com.company.resourceallocation.exception.DuplicateResourceException;
+import com.company.resourceallocation.exception.ProjectInUseException;
 import com.company.resourceallocation.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +21,7 @@ public class ProjectService {
 
     ProjectRepository projectRepository;
     ProjectMapper projectMapper;
+    AllocationRepository allocationRepository;
 
     @Transactional
     public ProjectResponse createProject(ProjectRequest request) {
@@ -75,7 +78,9 @@ public class ProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Project", id));
 
-        // TODO: Phase 4 - check active allocations before deleting (similar to BR-EMP-03)
+        if (allocationRepository.existsByProjectProjectId(id)) {
+            throw new ProjectInUseException("Cannot delete project: still has active allocations");
+        }
 
         projectRepository.delete(project);
     }

@@ -36,7 +36,7 @@ public class Allocation {
     @Column(name = "allocation_percent", nullable = false)
     Integer allocationPercent;
 
-    @Column(name = "role_in_project", length = 50)
+    @Column(name = "role_in_project", length = 100)
     String roleInProject;
 
     @Column(name = "start_date")

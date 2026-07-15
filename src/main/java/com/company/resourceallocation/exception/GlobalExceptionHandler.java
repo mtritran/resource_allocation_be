@@ -17,7 +17,11 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), req);
     }
 
-    @ExceptionHandler({DuplicateResourceException.class, EmployeeInUseException.class})
+    @ExceptionHandler({
+            DuplicateResourceException.class,
+            EmployeeInUseException.class,
+            ProjectInUseException.class
+    })
     public ResponseEntity<ErrorResponse> handleConflict(RuntimeException ex, HttpServletRequest req) {
         return build(HttpStatus.CONFLICT, ex.getMessage(), req);
     }
@@ -44,12 +48,14 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
     }
 
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleMessageNotReadable(
+            org.springframework.http.converter.HttpMessageNotReadableException ex, HttpServletRequest req) {
+        return build(HttpStatus.BAD_REQUEST, "Malformed JSON request or invalid values: " + ex.getMessage(), req);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex, HttpServletRequest req) {
-        String className = ex.getClass().getName();
-        if (className.contains("HttpMessageNotReadableException") || className.contains("InvalidFormatException")) {
-            return build(HttpStatus.BAD_REQUEST, "Malformed JSON request or invalid values: " + ex.getMessage(), req);
-        }
         return build(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), req);
     }
 

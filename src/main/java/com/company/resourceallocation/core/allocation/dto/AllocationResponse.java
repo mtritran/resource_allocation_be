@@ -3,6 +3,7 @@ package com.company.resourceallocation.core.allocation.dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,4 +22,5 @@ public class AllocationResponse {
     String roleInProject;
     LocalDate startDate;
     LocalDate endDate;
+    LocalDateTime createdAt;
 }

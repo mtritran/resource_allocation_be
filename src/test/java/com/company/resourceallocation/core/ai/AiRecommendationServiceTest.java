@@ -39,7 +39,7 @@ public class AiRecommendationServiceTest {
     @Test
     void should_returnRecommendedResources_when_geminiRespondsWithValidJson() {
         // Arrange: dữ liệu thật từ database
-        when(reportService.getAvailableReport(50)).thenReturn(List.of(
+        when(reportService.getAvailableReport(1)).thenReturn(List.of(
                 new AvailableResponse(1L, "Nguyen Van A", 60),
                 new AvailableResponse(2L, "Tran Thi B", 20)
         ));
@@ -153,7 +153,7 @@ public class AiRecommendationServiceTest {
 
         when(geminiClient.call(anyString())).thenReturn("Lỗi API.");
 
-        AiRiskResponse result = aiRecommendationService.detectRisks("query test");
+        AiRiskResponse result = aiRecommendationService.detectRisks("Sprint risk analysis");
 
         assertNotNull(result);
         assertFalse(result.getRisks().isEmpty()); // fallback tạo risks từ data thật

@@ -28,45 +28,27 @@ public class AiRecommendationService {
 
     /**
      * AI Resource Recommendation — endpoint 5.1
-     * Flow: parse query → lấy available report thật → filter theo role/query → build prompt → gọi Gemini format
+     * Flow: lấy available report thật + roles → build prompt linh hoạt cho AI lọc → gọi Gemini format
      */
     public AiRecommendResponse getRecommendations(String query) {
         if (query == null || query.trim().isEmpty() || query.trim().equalsIgnoreCase("string")) {
             return AiRecommendResponse.builder().recommendedResources(List.of()).build();
         }
 
-        // 1. Parse threshold & role
-        int minAvailable = extractMinAvailable(query);
-        String parsedRole = extractRole(query);
-        String queryClean = query.trim().toLowerCase();
+        // 1. Lấy dữ liệu thật từ database (minAvailable = 1 để lấy tất cả còn available)
+        List<AvailableResponse> availableList = reportService.getAvailableReport(1);
 
-        // 2. Lấy dữ liệu thật từ database
-        List<AvailableResponse> availableList = reportService.getAvailableReport(minAvailable);
-
-        // 3. Lọc danh sách khả dụng dựa trên từ khóa role hoặc tên nhân viên trong query
-        List<AvailableResponse> filteredList = availableList.stream()
-                .filter(a -> employeeRepository.findById(a.getEmployeeId())
-                        .map(emp -> {
-                            if (parsedRole != null) {
-                                return emp.getRole().toLowerCase().contains(parsedRole.toLowerCase());
-                            }
-                            // Nếu không tách được role cố định, tìm kiếm tương đối tên hoặc chức danh
-                            return emp.getFullName().toLowerCase().contains(queryClean) ||
-                                   emp.getRole().toLowerCase().contains(queryClean);
-                        }).orElse(false))
-                .toList();
-
-        // Nếu không có nhân sự nào khớp → trả về rỗng ngay lập tức (không cần gọi AI)
-        if (filteredList.isEmpty()) {
-            return AiRecommendResponse.builder().recommendedResources(List.of()).build();
-        }
-
-        // 4. Serialize thành context cho prompt
-        String realDataContext = filteredList.stream()
-                .map(a -> "- %s: available=%d%%".formatted(a.getEmployeeName(), a.getAvailable()))
+        // 2. Fetch full employee details (name, role, available %) to build context for Gemini
+        String realDataContext = availableList.stream()
+                .map(a -> {
+                    String role = employeeRepository.findById(a.getEmployeeId())
+                            .map(emp -> emp.getRole())
+                            .orElse("N/A");
+                    return "- %s (Role: %s): available=%d%%".formatted(a.getEmployeeName(), role, a.getAvailable());
+                })
                 .collect(Collectors.joining("\n"));
 
-        // 5. Build prompt — số liệu 100% từ database, AI chỉ format câu trả lời
+        // 3. Build prompt — AI có đầy đủ tên & role & available% thực tế để tự lọc linh hoạt
         String prompt = """
                 Bạn là AI hỗ trợ quản lý phân bổ nhân sự. Dưới đây là danh sách nhân viên còn khả năng làm việc (available capacity) LẤY TRỰC TIẾP TỪ DATABASE — bạn KHÔNG ĐƯỢC tự bịa thêm hoặc thay đổi bất kỳ con số nào:
 
@@ -74,17 +56,22 @@ public class AiRecommendationService {
 
                 Yêu cầu người dùng: "%s"
 
-                Hãy lọc từ danh sách THỰC TẾ ở trên những nhân viên phù hợp với yêu cầu và trả lời ngắn gọn, chỉ liệt kê tên nhân viên và %% available. Trả về theo đúng định dạng JSON:
-                {
-                  "recommendedResources": [
-                    { "employee": "Tên nhân viên", "available": số_thực_tế }
-                  ]
-                }
-                Chỉ trả về JSON, không thêm bất kỳ giải thích nào khác.
+                Hãy thực hiện các yêu cầu sau:
+                1. Nếu yêu cầu của người dùng là chào hỏi, nói nhảm, test từ khóa mặc định (như "string"), hoặc không liên quan đến việc tìm kiếm/đề xuất nhân sự từ danh sách trên, hãy trả về danh sách rỗng:
+                   {
+                     "recommendedResources": []
+                   }
+                2. Nếu yêu cầu hợp lệ, hãy lọc từ danh sách thực tế ở trên những nhân sự thỏa mãn yêu cầu của người dùng (về Role/Chức vụ và phần trăm Available). Trả về theo định dạng JSON sau:
+                   {
+                     "recommendedResources": [
+                       { "employee": "Tên nhân viên thực tế", "available": số_phần_trăm_available_thực_tế }
+                     ]
+                   }
+                Chỉ trả về JSON, không thêm bất kỳ văn bản hay giải thích nào khác.
                 """.formatted(realDataContext, query);
 
         try {
-            // 6. Gọi Gemini
+            // 4. Gọi Gemini
             String rawResponse = geminiClient.call(prompt);
             log.debug("Gemini recommend raw response: {}", rawResponse);
 
@@ -93,9 +80,28 @@ public class AiRecommendationService {
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             return mapper.readValue(json, AiRecommendResponse.class);
         } catch (Exception e) {
-            log.warn("Gemini call or parse failed, falling back to raw data. Error: {}", e.getMessage());
-            // Fallback: trả thẳng data đã được filter từ database, không qua AI format
-            List<AiRecommendResponse.RecommendedResource> resources = filteredList.stream()
+            log.warn("Gemini call or parse failed, falling back to offline parsing. Error: {}", e.getMessage());
+            
+            // Fallback offline: tự lọc bằng regex khi Gemini bị lỗi/chặn hạn mức
+            int minAvailable = extractMinAvailable(query);
+            String parsedRole = extractRole(query);
+            String queryClean = query.trim().toLowerCase();
+
+            // Nếu câu hỏi không chứa thông tin về role hay threshold trong chế độ fallback → trả về trống
+            if (parsedRole == null && !queryClean.matches(".*\\d+.*") && !queryClean.contains("rảnh") && !queryClean.contains("available")) {
+                return AiRecommendResponse.builder().recommendedResources(List.of()).build();
+            }
+
+            List<AiRecommendResponse.RecommendedResource> resources = availableList.stream()
+                    .filter(a -> employeeRepository.findById(a.getEmployeeId())
+                            .map(emp -> {
+                                if (parsedRole != null) {
+                                    return emp.getRole().toLowerCase().contains(parsedRole.toLowerCase());
+                                }
+                                return emp.getFullName().toLowerCase().contains(queryClean) ||
+                                       emp.getRole().toLowerCase().contains(queryClean);
+                            }).orElse(false))
+                    .filter(a -> a.getAvailable() >= minAvailable)
                     .map(a -> new AiRecommendResponse.RecommendedResource(a.getEmployeeName(), a.getAvailable()))
                     .toList();
             return AiRecommendResponse.builder().recommendedResources(resources).build();
@@ -150,14 +156,19 @@ public class AiRecommendationService {
 
                 Yêu cầu người dùng: "%s"
 
-                Dựa vào dữ liệu THỰC TẾ trên, hãy phân tích rủi ro và trả về JSON:
-                {
-                  "risks": [
-                    "Mô tả rủi ro 1 với số liệu thực tế",
-                    "Mô tả rủi ro 2 với số liệu thực tế"
-                  ]
-                }
-                Chỉ trả về JSON, không thêm giải thích. Số liệu trong risks phải khớp với data thực tế ở trên.
+                Hãy thực hiện các yêu cầu sau:
+                1. Nếu yêu cầu của người dùng là chào hỏi, nói nhảm, hoặc test từ khóa mặc định (như "string"), hãy trả về danh sách rỗng:
+                   {
+                     "risks": []
+                   }
+                2. Nếu yêu cầu là phân tích rủi ro hợp lệ (ví dụ: "Sprint tới cần thêm nhân sự", "check rủi ro", "capacity hiện tại thế nào"), hãy trả về danh sách các rủi ro theo định dạng JSON sau:
+                   {
+                     "risks": [
+                       "Mô tả rủi ro 1 với số liệu thực tế",
+                       "Mô tả rủi ro 2 với số liệu thực tế"
+                     ]
+                   }
+                Chỉ trả về JSON, không thêm bất kỳ giải thích nào khác. Số liệu trong risks phải khớp với data thực tế ở trên.
                 """.formatted(totalEmployees, avgUtilization, overloadedCount, highAvailableCount,
                 utilizationContext, overloadedContext, query);
 
@@ -171,7 +182,12 @@ public class AiRecommendationService {
             return mapper.readValue(json, AiRiskResponse.class);
         } catch (Exception e) {
             log.warn("Gemini call or parse failed, falling back to raw risks. Error: {}", e.getMessage());
-            // Fallback: tạo risks từ data thật
+            
+            // Fallback offline: tự sinh phân tích dựa trên dữ liệu thô
+            String queryClean = query.trim().toLowerCase();
+            if (!queryClean.contains("sprint") && !queryClean.contains("risk") && !queryClean.contains("rủi ro") && !queryClean.contains("cần") && !queryClean.contains("thêm")) {
+                return AiRiskResponse.builder().risks(List.of()).build();
+            }
             List<String> risks = List.of(
                     "Utilization trung bình của team là %.1f%%.".formatted(avgUtilization),
                     "Có %d nhân viên overloaded (>90%%).".formatted(overloadedCount),
