@@ -207,13 +207,13 @@ Làm trước vì mọi module sau đều phụ thuộc vào phần này.
 
 ## Phase 2 — Module Employee (CRUD đơn giản nhất, làm mẫu cho 2 module sau)
 
-- [ ] `Employee.java` (Entity)
-- [ ] `EmployeeRepository.java`
-- [ ] `dto/EmployeeRequest.java`, `dto/EmployeeResponse.java`
-- [ ] `EmployeeMapper.java`
-- [ ] `EmployeeService.java` — CRUD + BR-EMP-01 (check trùng code/email), BR-EMP-02 (404)
-- [ ] `EmployeeController.java` — 4 endpoint theo `api-specs.md` mục 1.1-1.5 (chưa cần `/workload` vội, để Phase 4)
-- [ ] Test thủ công qua Postman: Create, Get all, Get by id, Update, Delete + case lỗi (trùng code, id không tồn tại)
+- [x] `Employee.java` (Entity)
+- [x] `EmployeeRepository.java`
+- [x] `dto/EmployeeRequest.java`, `dto/EmployeeResponse.java`
+- [x] `EmployeeMapper.java`
+- [x] `EmployeeService.java` — CRUD + BR-EMP-01 (check trùng code/email), BR-EMP-02 (404)
+- [x] `EmployeeController.java` — 4 endpoint theo `api-specs.md` mục 1.1-1.5 (chưa cần `/workload` vội, để Phase 4)
+- [x] Test thủ công qua Postman: Create, Get all, Get by id, Update, Delete + case lỗi (trùng code, id không tồn tại)
 
 **Deliverable:** CRUD Employee hoàn chỉnh, dùng làm pattern mẫu để copy sang Project/Allocation.
 
