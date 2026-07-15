@@ -8,7 +8,7 @@ Lộ trình chia theo phase, mỗi phase build xong nên chạy được và tes
 
 ### 0.1 Docker Compose — PostgreSQL + pgAdmin
 
-- [ ] Tạo `docker-compose.yml` tại thư mục gốc của project:
+- [x] Tạo `docker-compose.yml` tại thư mục gốc của project:
   ```yaml
   version: '3.8'
 
