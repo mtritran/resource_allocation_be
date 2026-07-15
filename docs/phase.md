@@ -223,12 +223,12 @@ Làm trước vì mọi module sau đều phụ thuộc vào phần này.
 
 ## Phase 3 — Module Project
 
-- [ ] `Project.java` (Entity) — bao gồm enum `ProjectStatus { PLANNING, ACTIVE, COMPLETED }`
-- [ ] `ProjectRepository.java`
-- [ ] `dto/ProjectRequest.java`, `dto/ProjectResponse.java`
-- [ ] `ProjectMapper.java`
-- [ ] `ProjectService.java` — CRUD + BR-PRJ-01 (check trùng code), BR-PRJ-02 (404), validate `endDate >= startDate`
-- [ ] `ProjectController.java` — theo `api-specs.md` mục 2.1-2.5
+- [x] `Project.java` (Entity) — bao gồm enum `ProjectStatus { PLANNING, ACTIVE, COMPLETED }`
+- [x] `ProjectRepository.java`
+- [x] `dto/ProjectRequest.java`, `dto/ProjectResponse.java`
+- [x] `ProjectMapper.java`
+- [x] `ProjectService.java` — CRUD + BR-PRJ-01 (check trùng code), BR-PRJ-02 (404), validate `endDate >= startDate`
+- [x] `ProjectController.java` — theo `api-specs.md` mục 2.1-2.5
 - [ ] Test thủ công qua Postman
 
 **Deliverable:** CRUD Project hoàn chỉnh, có validate status enum.

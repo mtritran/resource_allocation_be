@@ -30,8 +30,17 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, message, req);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest req) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex, HttpServletRequest req) {
+        String className = ex.getClass().getName();
+        if (className.contains("HttpMessageNotReadableException") || className.contains("InvalidFormatException")) {
+            return build(HttpStatus.BAD_REQUEST, "Malformed JSON request or invalid values: " + ex.getMessage(), req);
+        }
         return build(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), req);
     }
 
