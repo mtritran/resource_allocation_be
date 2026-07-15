@@ -1,4 +1,4 @@
-package com.company.resourceallocation.exception;
+package com.company.resourceallocation.core.project;
 
 public class InvalidProjectStatusException extends RuntimeException {
     public InvalidProjectStatusException(String message) {

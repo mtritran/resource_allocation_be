@@ -7,6 +7,7 @@ import com.company.resourceallocation.core.employee.EmployeeRepository;
 import com.company.resourceallocation.core.project.Project;
 import com.company.resourceallocation.core.project.ProjectRepository;
 import com.company.resourceallocation.core.project.ProjectStatus;
+import com.company.resourceallocation.core.project.InvalidProjectStatusException;
 import com.company.resourceallocation.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

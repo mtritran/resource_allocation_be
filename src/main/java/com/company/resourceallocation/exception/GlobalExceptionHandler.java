@@ -1,5 +1,10 @@
 package com.company.resourceallocation.exception;
 
+import com.company.resourceallocation.core.employee.EmployeeInUseException;
+import com.company.resourceallocation.core.project.ProjectInUseException;
+import com.company.resourceallocation.core.project.InvalidProjectStatusException;
+import com.company.resourceallocation.core.allocation.AllocationExceededException;
+import com.company.resourceallocation.core.allocation.InvalidAllocationPercentException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

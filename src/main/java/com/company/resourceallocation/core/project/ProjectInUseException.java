@@ -1,4 +1,4 @@
-package com.company.resourceallocation.exception;
+package com.company.resourceallocation.core.project;
 
 public class ProjectInUseException extends RuntimeException {
     public ProjectInUseException(String message) {

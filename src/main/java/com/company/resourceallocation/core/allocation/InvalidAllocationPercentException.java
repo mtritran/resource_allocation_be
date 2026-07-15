@@ -1,4 +1,4 @@
-package com.company.resourceallocation.exception;
+package com.company.resourceallocation.core.allocation;
 
 public class InvalidAllocationPercentException extends RuntimeException {
     public InvalidAllocationPercentException(String message) {

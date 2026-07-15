@@ -6,7 +6,6 @@ import com.company.resourceallocation.core.employee.dto.WorkloadResponse;
 import com.company.resourceallocation.core.allocation.Allocation;
 import com.company.resourceallocation.core.allocation.AllocationRepository;
 import com.company.resourceallocation.exception.DuplicateResourceException;
-import com.company.resourceallocation.exception.EmployeeInUseException;
 import com.company.resourceallocation.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

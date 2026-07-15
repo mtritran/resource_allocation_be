@@ -4,7 +4,6 @@ import com.company.resourceallocation.core.project.dto.ProjectRequest;
 import com.company.resourceallocation.core.project.dto.ProjectResponse;
 import com.company.resourceallocation.core.allocation.AllocationRepository;
 import com.company.resourceallocation.exception.DuplicateResourceException;
-import com.company.resourceallocation.exception.ProjectInUseException;
 import com.company.resourceallocation.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

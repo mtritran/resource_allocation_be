@@ -4,7 +4,6 @@ import com.company.resourceallocation.core.allocation.AllocationRepository;
 import com.company.resourceallocation.core.employee.dto.EmployeeRequest;
 import com.company.resourceallocation.core.employee.dto.EmployeeResponse;
 import com.company.resourceallocation.exception.DuplicateResourceException;
-import com.company.resourceallocation.exception.EmployeeInUseException;
 import com.company.resourceallocation.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

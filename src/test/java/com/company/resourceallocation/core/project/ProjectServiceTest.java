@@ -2,6 +2,7 @@ package com.company.resourceallocation.core.project;
 
 import com.company.resourceallocation.core.project.dto.ProjectRequest;
 import com.company.resourceallocation.core.project.dto.ProjectResponse;
+import com.company.resourceallocation.core.allocation.AllocationRepository;
 import com.company.resourceallocation.exception.DuplicateResourceException;
 import com.company.resourceallocation.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,9 @@ public class ProjectServiceTest {
 
     @Mock
     ProjectMapper projectMapper;
+
+    @Mock
+    AllocationRepository allocationRepository;
 
     @InjectMocks
     ProjectService projectService;
@@ -109,7 +113,26 @@ public class ProjectServiceTest {
         when(projectMapper.toResponse(project)).thenReturn(response);
 
         ProjectResponse result = projectService.createProject(request);
-
-        assertEquals(ProjectStatus.PLANNING, result.getStatus());
-    }
-}
+ 
+         assertEquals(ProjectStatus.PLANNING, result.getStatus());
+     }
+ 
+     @Test
+     void should_deleteProject_when_noAllocationsExist() {
+         when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+         when(allocationRepository.existsByProjectProjectId(1L)).thenReturn(false);
+ 
+         projectService.deleteProject(1L);
+ 
+         verify(projectRepository, times(1)).delete(project);
+     }
+ 
+     @Test
+     void should_throwProjectInUseException_when_allocationsExist() {
+         when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+         when(allocationRepository.existsByProjectProjectId(1L)).thenReturn(true);
+ 
+         assertThrows(ProjectInUseException.class, () -> projectService.deleteProject(1L));
+         verify(projectRepository, never()).delete(any());
+     }
+ }
