@@ -108,7 +108,7 @@ Lộ trình chia theo phase, mỗi phase build xong nên chạy được và tes
 
 ### 0.3 Flyway migration — thay thế chạy SQL script thủ công
 
-- [ ] Tạo migration file đầu tiên tại `src/main/resources/db/migration/V1__init_schema.sql`:
+- [x] Tạo migration file đầu tiên tại `src/main/resources/db/migration/V1__init_schema.sql`:
   ```sql
   -- ============================================================
   -- V1__init_schema.sql
