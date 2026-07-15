@@ -1,6 +1,7 @@
 package com.company.resourceallocation.core.employee.dto;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 
 @Getter
@@ -8,13 +9,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EmployeeResponse {
 
-    private Long employeeId;
-    private String employeeCode;
-    private String fullName;
-    private String email;
-    private String role;
-    private String department;
-    private LocalDateTime createdAt;
+    Long employeeId;
+    String employeeCode;
+    String fullName;
+    String email;
+    String role;
+    String department;
+    LocalDateTime createdAt;
 }

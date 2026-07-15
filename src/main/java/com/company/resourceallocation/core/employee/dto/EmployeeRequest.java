@@ -3,26 +3,28 @@ package com.company.resourceallocation.core.employee.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EmployeeRequest {
 
     @NotBlank(message = "Employee code is required")
-    private String employeeCode;
+    String employeeCode;
 
     @NotBlank(message = "Full name is required")
-    private String fullName;
+    String fullName;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
-    private String email;
+    String email;
 
     @NotBlank(message = "Role is required")
-    private String role;
+    String role;
 
-    private String department;
+    String department;
 }

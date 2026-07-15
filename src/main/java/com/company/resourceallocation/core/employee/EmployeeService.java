@@ -5,6 +5,8 @@ import com.company.resourceallocation.core.employee.dto.EmployeeResponse;
 import com.company.resourceallocation.exception.DuplicateResourceException;
 import com.company.resourceallocation.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.AccessLevel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,10 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmployeeService {
 
-    private final EmployeeRepository employeeRepository;
-    private final EmployeeMapper employeeMapper;
+    EmployeeRepository employeeRepository;
+    EmployeeMapper employeeMapper;
 
     @Transactional
     public EmployeeResponse createEmployee(EmployeeRequest request) {
