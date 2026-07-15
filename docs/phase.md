@@ -195,11 +195,11 @@ Lộ trình chia theo phase, mỗi phase build xong nên chạy được và tes
 
 Làm trước vì mọi module sau đều phụ thuộc vào phần này.
 
-- [ ] `exception/ErrorResponse.java`
-- [ ] `exception/ResourceNotFoundException.java`, `DuplicateResourceException.java` (2 exception dùng chung nhiều module nhất)
-- [ ] `exception/GlobalExceptionHandler.java` — xử lý 2 exception trên + `MethodArgumentNotValidException`
-- [ ] `aspect/LoggingAspect.java` — pointcut trỏ vào `core..*Service.create*/update*/delete*` (viết sẵn, dù chưa có Service nào để log — sẽ hoạt động ngay khi module đầu tiên xong)
-- [ ] `config/OpenApiConfig.java` (bonus, có thể để cuối)
+- [x] `exception/ErrorResponse.java`
+- [x] `exception/ResourceNotFoundException.java`, `DuplicateResourceException.java` (2 exception dùng chung nhiều module nhất)
+- [x] `exception/GlobalExceptionHandler.java` — xử lý 2 exception trên + `MethodArgumentNotValidException`
+- [x] `aspect/LoggingAspect.java` — pointcut trỏ vào `core..*Service.create*/update*/delete*` (viết sẵn, dù chưa có Service nào để log — sẽ hoạt động ngay khi module đầu tiên xong)
+- [x] `config/OpenApiConfig.java` (bonus, có thể để cuối)
 
 **Deliverable:** Chạy 1 request lỗi giả (VD gọi endpoint chưa tồn tại) vẫn thấy format `ErrorResponse` chuẩn khi tích hợp module đầu tiên.
 
