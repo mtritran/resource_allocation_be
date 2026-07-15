@@ -2,6 +2,8 @@ package com.company.resourceallocation.core.ai;
 
 import com.company.resourceallocation.core.ai.dto.AiRecommendResponse;
 import com.company.resourceallocation.core.ai.dto.AiRiskResponse;
+import com.company.resourceallocation.core.employee.Employee;
+import com.company.resourceallocation.core.employee.EmployeeRepository;
 import com.company.resourceallocation.core.report.ReportService;
 import com.company.resourceallocation.core.report.dto.AvailableResponse;
 import com.company.resourceallocation.core.report.dto.OverloadedResponse;
@@ -13,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -27,16 +30,34 @@ public class AiRecommendationServiceTest {
     @Mock
     GeminiClient geminiClient;
 
+    @Mock
+    EmployeeRepository employeeRepository;
+
     @InjectMocks
     AiRecommendationService aiRecommendationService;
 
     @Test
     void should_returnRecommendedResources_when_geminiRespondsWithValidJson() {
         // Arrange: dữ liệu thật từ database
-        when(reportService.getAvailableReport(1)).thenReturn(List.of(
+        when(reportService.getAvailableReport(50)).thenReturn(List.of(
                 new AvailableResponse(1L, "Nguyen Van A", 60),
                 new AvailableResponse(2L, "Tran Thi B", 20)
         ));
+
+        // Mock employee data for role filtering
+        Employee empA = Employee.builder()
+                .employeeId(1L)
+                .fullName("Nguyen Van A")
+                .role("Java Developer")
+                .build();
+        Employee empB = Employee.builder()
+                .employeeId(2L)
+                .fullName("Tran Thi B")
+                .role("Java Developer")
+                .build();
+
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(empA));
+        when(employeeRepository.findById(2L)).thenReturn(Optional.of(empB));
 
         // Gemini trả về JSON chuẩn
         when(geminiClient.call(anyString())).thenReturn("""
@@ -64,14 +85,28 @@ public class AiRecommendationServiceTest {
                 new AvailableResponse(2L, "Tran Thi B", 20)
         ));
 
+        Employee empA = Employee.builder()
+                .employeeId(1L)
+                .fullName("Nguyen Van A")
+                .role("Java Developer")
+                .build();
+        Employee empB = Employee.builder()
+                .employeeId(2L)
+                .fullName("Tran Thi B")
+                .role("Java Developer")
+                .build();
+
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(empA));
+        when(employeeRepository.findById(2L)).thenReturn(Optional.of(empB));
+
         // Gemini trả về text bình thường, không phải JSON
         when(geminiClient.call(anyString())).thenReturn("Xin chào! Tôi có thể giúp gì cho bạn?");
 
         // Khi parse lỗi → fallback về raw data từ database
-        AiRecommendResponse result = aiRecommendationService.getRecommendations("query test");
+        AiRecommendResponse result = aiRecommendationService.getRecommendations("Java");
 
         assertNotNull(result);
-        assertEquals(2, result.getRecommendedResources().size()); // fallback trả tất cả available
+        assertEquals(2, result.getRecommendedResources().size()); // fallback trả tất cả available đã filter
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.company.resourceallocation.core.ai;
 
 import com.company.resourceallocation.core.ai.dto.AiRecommendResponse;
 import com.company.resourceallocation.core.ai.dto.AiRiskResponse;
+import com.company.resourceallocation.core.employee.EmployeeRepository;
 import com.company.resourceallocation.core.report.ReportService;
 import com.company.resourceallocation.core.report.dto.AvailableResponse;
 import com.company.resourceallocation.core.report.dto.OverloadedResponse;
@@ -12,7 +13,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.AccessLevel;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,21 +24,49 @@ public class AiRecommendationService {
 
     ReportService reportService;
     GeminiClient geminiClient;
+    EmployeeRepository employeeRepository;
 
     /**
      * AI Resource Recommendation — endpoint 5.1
-     * Flow: lấy available report thật → build prompt có số thật → gọi Gemini format → trả về danh sách
+     * Flow: parse query → lấy available report thật → filter theo role/query → build prompt → gọi Gemini format
      */
     public AiRecommendResponse getRecommendations(String query) {
-        // 1. Lấy dữ liệu thật từ database (minAvailable = 1 để lấy tất cả còn available)
-        List<AvailableResponse> availableList = reportService.getAvailableReport(1);
+        if (query == null || query.trim().isEmpty() || query.trim().equalsIgnoreCase("string")) {
+            return AiRecommendResponse.builder().recommendedResources(List.of()).build();
+        }
 
-        // 2. Serialize thành context cho prompt
-        String realDataContext = availableList.stream()
+        // 1. Parse threshold & role
+        int minAvailable = extractMinAvailable(query);
+        String parsedRole = extractRole(query);
+        String queryClean = query.trim().toLowerCase();
+
+        // 2. Lấy dữ liệu thật từ database
+        List<AvailableResponse> availableList = reportService.getAvailableReport(minAvailable);
+
+        // 3. Lọc danh sách khả dụng dựa trên từ khóa role hoặc tên nhân viên trong query
+        List<AvailableResponse> filteredList = availableList.stream()
+                .filter(a -> employeeRepository.findById(a.getEmployeeId())
+                        .map(emp -> {
+                            if (parsedRole != null) {
+                                return emp.getRole().toLowerCase().contains(parsedRole.toLowerCase());
+                            }
+                            // Nếu không tách được role cố định, tìm kiếm tương đối tên hoặc chức danh
+                            return emp.getFullName().toLowerCase().contains(queryClean) ||
+                                   emp.getRole().toLowerCase().contains(queryClean);
+                        }).orElse(false))
+                .toList();
+
+        // Nếu không có nhân sự nào khớp → trả về rỗng ngay lập tức (không cần gọi AI)
+        if (filteredList.isEmpty()) {
+            return AiRecommendResponse.builder().recommendedResources(List.of()).build();
+        }
+
+        // 4. Serialize thành context cho prompt
+        String realDataContext = filteredList.stream()
                 .map(a -> "- %s: available=%d%%".formatted(a.getEmployeeName(), a.getAvailable()))
                 .collect(Collectors.joining("\n"));
 
-        // 3. Build prompt — số liệu 100% từ database, AI chỉ format câu trả lời
+        // 5. Build prompt — số liệu 100% từ database, AI chỉ format câu trả lời
         String prompt = """
                 Bạn là AI hỗ trợ quản lý phân bổ nhân sự. Dưới đây là danh sách nhân viên còn khả năng làm việc (available capacity) LẤY TRỰC TIẾP TỪ DATABASE — bạn KHÔNG ĐƯỢC tự bịa thêm hoặc thay đổi bất kỳ con số nào:
 
@@ -56,7 +84,7 @@ public class AiRecommendationService {
                 """.formatted(realDataContext, query);
 
         try {
-            // 4. Gọi Gemini
+            // 6. Gọi Gemini
             String rawResponse = geminiClient.call(prompt);
             log.debug("Gemini recommend raw response: {}", rawResponse);
 
@@ -66,8 +94,8 @@ public class AiRecommendationService {
             return mapper.readValue(json, AiRecommendResponse.class);
         } catch (Exception e) {
             log.warn("Gemini call or parse failed, falling back to raw data. Error: {}", e.getMessage());
-            // Fallback: trả thẳng data từ database, không qua AI format
-            List<AiRecommendResponse.RecommendedResource> resources = availableList.stream()
+            // Fallback: trả thẳng data đã được filter từ database, không qua AI format
+            List<AiRecommendResponse.RecommendedResource> resources = filteredList.stream()
                     .map(a -> new AiRecommendResponse.RecommendedResource(a.getEmployeeName(), a.getAvailable()))
                     .toList();
             return AiRecommendResponse.builder().recommendedResources(resources).build();
@@ -79,6 +107,10 @@ public class AiRecommendationService {
      * Flow: lấy utilization + overloaded report thật → build prompt có số thật → gọi Gemini → trả risks
      */
     public AiRiskResponse detectRisks(String query) {
+        if (query == null || query.trim().isEmpty() || query.trim().equalsIgnoreCase("string")) {
+            return AiRiskResponse.builder().risks(List.of()).build();
+        }
+
         // 1. Lấy dữ liệu thật
         List<UtilizationResponse> utilizationList = reportService.getUtilizationReport();
         List<OverloadedResponse> overloadedList = reportService.getOverloadedReport();
@@ -163,5 +195,39 @@ public class AiRecommendationService {
             }
         }
         return trimmed;
+    }
+
+    private int extractMinAvailable(String query) {
+        if (query == null) return 1;
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\d+)\\s*%");
+        java.util.regex.Matcher matcher = pattern.matcher(query);
+        if (matcher.find()) {
+            try {
+                return Integer.parseInt(matcher.group(1));
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
+        pattern = java.util.regex.Pattern.compile("tối thiểu\\s+(\\d+)");
+        matcher = pattern.matcher(query.toLowerCase());
+        if (matcher.find()) {
+            try {
+                return Integer.parseInt(matcher.group(1));
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
+        return 1;
+    }
+
+    private String extractRole(String query) {
+        if (query == null) return null;
+        String q = query.toLowerCase();
+        if (q.contains("java")) return "Java";
+        if (q.contains("react")) return "React";
+        if (q.contains("devops")) return "DevOps";
+        if (q.contains("qa") || q.contains("tester")) return "QA";
+        if (q.contains("pm") || q.contains("project manager")) return "Project Manager";
+        return null;
     }
 }
