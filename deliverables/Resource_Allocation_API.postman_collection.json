@@ -1,0 +1,944 @@
+{
+  "info": {
+    "name": "Resource Allocation API",
+    "description": "Complete Postman collection for Resource Allocation System API\n\nBase URL: {{baseUrl}}/api/v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "1.1 Create Employee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201 Created\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Response has employeeId\", () => pm.response.to.have.jsonBody('employeeId'));",
+                  "pm.test(\"Response has employeeCode\", () => pm.response.to.have.jsonBody('employeeCode'));",
+                  "pm.response.to.have.header('Content-Type');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeCode\": \"EMP001\",\n  \"fullName\": \"Tuan Ho Anh\",\n  \"email\": \"tuanha@company.com\",\n  \"role\": \"Senior Developer\",\n  \"department\": \"FSOFT-Q1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees"]
+            }
+          }
+        },
+        {
+          "name": "1.2 Get All Employees",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response is paginated\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('content');",
+                  "  pm.expect(json).to.have.property('totalElements');",
+                  "  pm.expect(json).to.have.property('page');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees"],
+              "query": [
+                { "key": "department", "value": "", "disabled": true },
+                { "key": "role", "value": "", "disabled": true },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.3 Get Employee by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response matches ID\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.employeeId).to.eql(pm.variables.get(\"employeeId\"));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees", "1"]
+            }
+          }
+        },
+        {
+          "name": "1.3b Get Employee by ID - 404 Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404 Not Found\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Error response fields exist\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('timestamp');",
+                  "  pm.expect(json).to.have.property('status', 404);",
+                  "  pm.expect(json).to.have.property('message');",
+                  "  pm.expect(json.message).to.include('not found');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees/99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees", "99999"]
+            }
+          }
+        },
+        {
+          "name": "1.4 Update Employee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Fields updated correctly\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.fullName).to.eql(\"Tuan Ho Anh Updated\");",
+                  "  pm.expect(json.department).to.eql(\"FSOFT-Q2\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeCode\": \"EMP001\",\n  \"fullName\": \"Tuan Ho Anh Updated\",\n  \"email\": \"tuanha@company.com\",\n  \"role\": \"Senior Developer\",\n  \"department\": \"FSOFT-Q2\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees", "1"]
+            }
+          }
+        },
+        {
+          "name": "1.5 Delete Employee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 204 No Content\", () => pm.response.to.have.status(204));",
+                  "pm.test(\"No body returned\", () => pm.response.to.be.empty);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees/99",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees", "99"]
+            }
+          }
+        },
+        {
+          "name": "1.5b Delete Employee - 409 Conflict (còn allocation)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 409 Conflict\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Error message mentions active allocations\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.message).to.include('active allocations');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees", "1"]
+            }
+          }
+        },
+        {
+          "name": "1.6 Get Employee Workload",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response has workload fields\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('employeeId');",
+                  "  pm.expect(json).to.have.property('employeeName');",
+                  "  pm.expect(json).to.have.property('totalAllocation');",
+                  "  pm.expect(json).to.have.property('available');",
+                  "  pm.expect(json).to.have.property('allocations');",
+                  "  pm.expect(json.totalAllocation + json.available).to.eql(100);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees/1/workload",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees", "1", "workload"]
+            }
+          }
+        },
+        {
+          "name": "1.6b Get Workload - Employee chưa có allocation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Workload is zero\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.totalAllocation).to.eql(0);",
+                  "  pm.expect(json.available).to.eql(100);",
+                  "  pm.expect(json.allocations).to.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees/3/workload",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees", "3", "workload"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "2.1 Create Project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201 Created\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Response has projectId\", () => pm.response.to.have.jsonBody('projectId'));",
+                  "pm.test(\"Status defaults to PLANNING\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('PLANNING');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectCode\": \"NCG\",\n  \"projectName\": \"New Core Gateway\",\n  \"customer\": \"ABC Corp\",\n  \"startDate\": \"2025-01-01\",\n  \"endDate\": \"2025-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "projects"]
+            }
+          }
+        },
+        {
+          "name": "2.2 Get All Projects",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response is paginated\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('content');",
+                  "  pm.expect(json).to.have.property('totalElements');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects?status=ACTIVE&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "projects"],
+              "query": [
+                { "key": "status", "value": "ACTIVE", "disabled": true },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.3 Get Project by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "projects", "1"]
+            }
+          }
+        },
+        {
+          "name": "2.3b Get Project by ID - 404 Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404 Not Found\", () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects/99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "projects", "99999"]
+            }
+          }
+        },
+        {
+          "name": "2.4 Update Project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Status updated to COMPLETED\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('COMPLETED');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectCode\": \"NCG\",\n  \"projectName\": \"New Core Gateway\",\n  \"customer\": \"ABC Corp\",\n  \"startDate\": \"2025-01-01\",\n  \"endDate\": \"2025-12-31\",\n  \"status\": \"COMPLETED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "projects", "1"]
+            }
+          }
+        },
+        {
+          "name": "2.5 Delete Project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 204 No Content\", () => pm.response.to.have.status(204));",
+                  "pm.test(\"No body returned\", () => pm.response.to.be.empty);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects/99",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "projects", "99"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Allocations",
+      "item": [
+        {
+          "name": "3.1a Create Allocation - 50% thành công",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201 Created\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Response has allocationId\", () => pm.response.to.have.jsonBody('allocationId'));",
+                  "pm.test(\"Employee and project info included\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('employeeName');",
+                  "  pm.expect(json).to.have.property('projectCode');",
+                  "  pm.expect(json.allocationPercent).to.eql(50);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": 1,\n  \"projectId\": 1,\n  \"allocationPercent\": 50,\n  \"roleInProject\": \"Backend Developer\",\n  \"startDate\": \"2025-01-01\",\n  \"endDate\": \"2025-06-30\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations"]
+            }
+          }
+        },
+        {
+          "name": "3.1b Create Allocation - 60% (tổng 110% -> 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400 Bad Request\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Error message about exceeding 100%\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.message).to.include('exceeds 100%');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": 1,\n  \"projectId\": 1,\n  \"allocationPercent\": 60\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations"]
+            }
+          }
+        },
+        {
+          "name": "3.1c Create Allocation - COMPLETED project (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400 Bad Request\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Error about COMPLETED project\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.message).to.include('COMPLETED');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": 2,\n  \"projectId\": 3,\n  \"allocationPercent\": 50\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations"]
+            }
+          }
+        },
+        {
+          "name": "3.1d Create Allocation - Employee not found (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404 Not Found\", () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": 99999,\n  \"projectId\": 1,\n  \"allocationPercent\": 50\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations"]
+            }
+          }
+        },
+        {
+          "name": "3.1e Create Allocation - Percent = 0 (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400 Bad Request\", () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": 2,\n  \"projectId\": 1,\n  \"allocationPercent\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations"]
+            }
+          }
+        },
+        {
+          "name": "3.2 Get All Allocations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response is paginated\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('content');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations?employeeId=1&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations"],
+              "query": [
+                { "key": "employeeId", "value": "1", "disabled": true },
+                { "key": "projectId", "value": "", "disabled": true },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3.3 Get Allocation by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations", "1"]
+            }
+          }
+        },
+        {
+          "name": "3.3b Get Allocation by ID - 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404 Not Found\", () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations/99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations", "99999"]
+            }
+          }
+        },
+        {
+          "name": "3.4 Update Allocation - giảm % (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Percent updated correctly\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.allocationPercent).to.eql(30);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": 1,\n  \"projectId\": 1,\n  \"allocationPercent\": 30,\n  \"roleInProject\": \"Backend Lead\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations", "1"]
+            }
+          }
+        },
+        {
+          "name": "3.5 Delete Allocation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 204 No Content\", () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations/99",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations", "99"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "4.1 Employee Utilization Report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response is array\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('array');",
+                  "  json.forEach(item => {",
+                  "    pm.expect(item).to.have.all.keys('employeeId', 'employeeName', 'totalAllocation');",
+                  "  });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reports/utilization",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reports", "utilization"]
+            }
+          }
+        },
+        {
+          "name": "4.2 Available Resource Report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response is array\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('array');",
+                  "  json.forEach(item => {",
+                  "    pm.expect(item).to.have.all.keys('employeeId', 'employeeName', 'available');",
+                  "    pm.expect(item.available).to.be.at.least(1);",
+                  "  });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reports/available",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reports", "available"]
+            }
+          }
+        },
+        {
+          "name": "4.2b Available Report với minAvailable=50",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"All items have available >= 50\", () => {",
+                  "  const json = pm.response.json();",
+                  "  json.forEach(item => pm.expect(item.available).to.be.at.least(50));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reports/available?minAvailable=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reports", "available"],
+              "query": [
+                { "key": "minAvailable", "value": "50" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "4.3 Overloaded Employee Report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response is array\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('array');",
+                  "  json.forEach(item => {",
+                  "    pm.expect(item).to.have.all.keys('employeeId', 'employeeName', 'totalAllocation');",
+                  "    pm.expect(item.totalAllocation).to.be.at.least(91);",
+                  "  });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reports/overloaded",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reports", "overloaded"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Bonus",
+      "item": [
+        {
+          "name": "5.1 AI Resource Recommendation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response has recommendedResources\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('recommendedResources');",
+                  "  pm.expect(json.recommendedResources).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"Tìm Java Developer còn tối thiểu 50% available\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/ai/recommend",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "ai", "recommend"]
+            }
+          }
+        },
+        {
+          "name": "5.2 AI Risk Detection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response has risks array\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('risks');",
+                  "  pm.expect(json.risks).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"Sprint tới cần thêm 2 Java Developer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/ai/risk-detection",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "ai", "risk-detection"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}
