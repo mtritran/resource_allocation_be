@@ -1,0 +1,60 @@
+{
+  "info": {
+    "name": "Resource Allocation API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "Create Employee",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeCode\": \"EMP001\",\n  \"fullName\": \"Tuan Ho Anh\",\n  \"email\": \"tuanha@company.com\",\n  \"role\": \"Senior Developer\",\n  \"department\": \"FSOFT-Q1\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/employees", "host": ["{{baseUrl}}"], "path": ["api", "v1", "employees"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Create Project",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectCode\": \"NCG\",\n  \"projectName\": \"New Core Gateway\",\n  \"customer\": \"ABC Corp\",\n  \"startDate\": \"2025-01-01\",\n  \"endDate\": \"2025-12-31\",\n  \"status\": \"PLANNING\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/projects", "host": ["{{baseUrl}}"], "path": ["api", "v1", "projects"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Allocations",
+      "item": [
+        {
+          "name": "Create Allocation",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeId\": 1,\n  \"projectId\": 1,\n  \"allocationPercent\": 50,\n  \"roleInProject\": \"Backend Developer\",\n  \"startDate\": \"2025-01-01\",\n  \"endDate\": \"2025-06-30\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/api/v1/allocations", "host": ["{{baseUrl}}"], "path": ["api", "v1", "allocations"]}
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [{"key": "baseUrl", "value": "http://localhost:8080"}]
+}

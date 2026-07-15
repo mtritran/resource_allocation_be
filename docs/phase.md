@@ -302,12 +302,12 @@ Làm trước vì mọi module sau đều phụ thuộc vào phần này.
 
 ## Phase 8 — Polish & Bonus kỹ thuật
 
-- [ ] Swagger UI hoàn chỉnh (`@Operation` cho từng endpoint theo `coding-conventions.md` mục 10)
-- [ ] Unit test cho `AllocationService` (ưu tiên cao nhất — theo `coding-conventions.md` mục 9), sau đó `EmployeeService`, `ProjectService`
-- [ ] Dockerfile cho app (multi-stage build) + cập nhật `docker-compose.yml` thêm service app
-- [ ] README.md: hướng dẫn chạy project (yêu cầu Docker), link Postman collection
-- [ ] Export Postman Collection theo đúng `api-specs.md`
-- [ ] Chụp API screenshot cho Deliverables
+- [x] Swagger UI hoàn chỉnh (`@Operation` cho từng endpoint theo `coding-conventions.md` mục 10)
+- [x] Unit test cho `AllocationService` (ưu tiên cao nhất — theo `coding-conventions.md` mục 9), sau đó `EmployeeService`, `ProjectService`
+- [x] Dockerfile cho app (multi-stage build) + cập nhật `docker-compose.yml` thêm service app
+- [x] README.md: hướng dẫn chạy project (yêu cầu Docker), link Postman collection
+- [x] Export Postman Collection theo đúng `api-specs.md`
+- [x] Chụp API screenshot cho Deliverables
 
 **Deliverable:** Đủ toàn bộ danh sách ở mục 9 "Deliverables" trong spec gốc.
 

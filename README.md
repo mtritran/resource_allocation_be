@@ -14,6 +14,21 @@ Trước khi chạy dự án, hãy đảm bảo máy tính của bạn đã cài
 
 ## Hướng dẫn Thiết lập & Chạy dự án
 
+### Cách 1: Chạy toàn bộ stack bằng Docker Compose
+```bash
+docker compose up --build -d
+```
+Sau đó:
+- API: http://localhost:8080
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- pgAdmin: http://localhost:5050
+
+### Cách 2: Chạy backend local (không dùng container app)
+```bash
+docker compose up -d postgres pgadmin
+./mvnw.cmd spring-boot:run
+```
+
 ### Bước 1: Chuẩn bị file biến môi trường (`.env`)
 1. Từ thư mục gốc của dự án, sao chép file cấu hình mẫu `.env.example` thành `.env`:
    ```bash

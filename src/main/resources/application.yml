@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB:resource_allocation}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:resource_allocation}
     username: ${POSTGRES_USER:dev}
     password: ${POSTGRES_PASSWORD:dev123}
     driver-class-name: org.postgresql.Driver
@@ -34,5 +34,5 @@ logging:
 
 ai:
   gemini:
-    api-key: ${GEMINI_API_KEY}
-    base-url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    api-key: ${GEMINI_API_KEY:}
+    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent}

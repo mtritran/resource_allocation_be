@@ -11,6 +11,9 @@ import com.company.resourceallocation.exception.AllocationExceededException;
 import com.company.resourceallocation.exception.InvalidAllocationPercentException;
 import com.company.resourceallocation.exception.InvalidProjectStatusException;
 import com.company.resourceallocation.exception.ResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -128,5 +132,32 @@ public class AllocationServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> allocationService.createAllocation(request));
+    }
+
+    @Test
+    void should_allowUpdate_when_existingAllocationIsExcludedFromCapacityCheck() {
+        when(allocationRepository.findById(10L)).thenReturn(Optional.of(allocation));
+        when(allocationRepository.sumAllocationByEmployeeExcluding(1L, 10L)).thenReturn(30);
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+        when(projectRepository.findById(2L)).thenReturn(Optional.of(project));
+        when(allocationRepository.save(any(Allocation.class))).thenReturn(allocation);
+        when(allocationMapper.toResponse(allocation)).thenReturn(response);
+
+        AllocationResponse result = allocationService.updateAllocation(10L, request);
+
+        assertNotNull(result);
+        verify(allocationRepository).save(any(Allocation.class));
+    }
+
+    @Test
+    void should_returnAllocations_when_filteringByEmployeeAndProject() {
+        Pageable pageable = Pageable.ofSize(10);
+        when(allocationRepository.findFiltered(1L, 2L, pageable)).thenReturn(new PageImpl<>(List.of(allocation), pageable, 1));
+        when(allocationMapper.toResponse(allocation)).thenReturn(response);
+
+        Page<AllocationResponse> result = allocationService.getAllocations(1L, 2L, pageable);
+
+        assertEquals(1, result.getTotalElements());
+        assertEquals(10L, result.getContent().get(0).getAllocationId());
     }
 }

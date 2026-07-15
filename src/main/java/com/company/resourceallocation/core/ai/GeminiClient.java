@@ -24,8 +24,8 @@ public class GeminiClient {
     private final ObjectMapper objectMapper;
 
     public GeminiClient(
-            @Value("${ai.gemini.base-url}") String baseUrl,
-            @Value("${ai.gemini.api-key}") String apiKey) {
+            @Value("${ai.gemini.base-url:https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent}") String baseUrl,
+            @Value("${ai.gemini.api-key:}") String apiKey) {
         this.apiKey = apiKey;
         this.objectMapper = new ObjectMapper();
         this.restClient = RestClient.builder()
@@ -37,6 +37,11 @@ public class GeminiClient {
      * Send a prompt to Gemini and return the plain text content of the first candidate.
      */
     public String call(String prompt) {
+        if (apiKey == null || apiKey.isBlank()) {
+            log.warn("Gemini API key is not configured; returning fallback response.");
+            return "{" + "\"recommendedResources\": []" + "}";
+        }
+
         Map<String, Object> requestBody = Map.of(
                 "contents", List.of(
                         Map.of("parts", List.of(

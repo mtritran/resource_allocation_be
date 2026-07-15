@@ -1,8 +1,10 @@
 package com.company.resourceallocation.core.employee;
 
+import com.company.resourceallocation.core.allocation.AllocationRepository;
 import com.company.resourceallocation.core.employee.dto.EmployeeRequest;
 import com.company.resourceallocation.core.employee.dto.EmployeeResponse;
 import com.company.resourceallocation.exception.DuplicateResourceException;
+import com.company.resourceallocation.exception.EmployeeInUseException;
 import com.company.resourceallocation.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,9 @@ public class EmployeeServiceTest {
 
     @Mock
     EmployeeMapper employeeMapper;
+
+    @Mock
+    AllocationRepository allocationRepository;
 
     @InjectMocks
     EmployeeService employeeService;
@@ -106,5 +111,14 @@ public class EmployeeServiceTest {
         when(employeeRepository.existsByEmailAndEmployeeIdNot(request.getEmail(), 1L)).thenReturn(true);
 
         assertThrows(DuplicateResourceException.class, () -> employeeService.updateEmployee(1L, request));
+    }
+
+    @Test
+    void should_throwEmployeeInUseException_when_deleteEmployeeHasActiveAllocations() {
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+        when(allocationRepository.existsByEmployeeEmployeeId(1L)).thenReturn(true);
+
+        assertThrows(EmployeeInUseException.class, () -> employeeService.deleteEmployee(1L));
+        verify(employeeRepository, never()).delete(any(Employee.class));
     }
 }

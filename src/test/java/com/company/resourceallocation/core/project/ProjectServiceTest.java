@@ -100,4 +100,16 @@ public class ProjectServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> projectService.getProjectById(999L));
     }
+
+    @Test
+    void should_setPlanningStatus_when_statusNotProvided() {
+        project.setStatus(null);
+        when(projectMapper.toEntity(request)).thenReturn(project);
+        when(projectRepository.save(project)).thenReturn(project);
+        when(projectMapper.toResponse(project)).thenReturn(response);
+
+        ProjectResponse result = projectService.createProject(request);
+
+        assertEquals(ProjectStatus.PLANNING, result.getStatus());
+    }
 }
