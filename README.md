@@ -24,11 +24,27 @@ Trước khi chạy dự án, hãy đảm bảo máy tính của bạn đã cài
 ---
 
 ### Bước 2: Khởi động Database & pgAdmin (Docker)
-Để chạy PostgreSQL và công cụ quản lý pgAdmin, mở terminal tại thư mục gốc chứa file `docker-compose.yml` và chạy lệnh:
-```bash
-docker compose up -d
-```
-*Lưu ý: Lệnh này sẽ khởi động cơ sở dữ liệu ngầm ở cổng mặc định `5432` và công cụ pgAdmin ở cổng `5050`.*
+1. Để chạy PostgreSQL và công cụ quản lý pgAdmin, mở terminal tại thư mục gốc chứa file `docker-compose.yml` và chạy lệnh:
+   ```bash
+   docker compose up -d
+   ```
+   *Lưu ý: Lệnh này sẽ khởi động cơ sở dữ liệu ngầm ở cổng mặc định `5432` và công cụ pgAdmin ở cổng `5050`.*
+
+2. Truy cập vào giao diện quản trị pgAdmin và đăng ký kết nối cơ sở dữ liệu:
+   * **URL truy cập:** [http://localhost:5050](http://localhost:5050)
+   * **Thông tin đăng nhập pgAdmin:**
+     * **Email:** `admin@company.com` (hoặc email cấu hình trong `.env`)
+     * **Password:** `admin123` (hoặc password cấu hình trong `.env`)
+   * **Cách tạo kết nối tới Database (Register Server):**
+     * Click chuột phải vào **Servers** -> **Register** -> **Server...**
+     * Tại tab **General**: Điền tên tùy chọn vào ô **Name** (Ví dụ: `Resource Allocation DB`).
+     * Tại tab **Connection**: Điền các thông tin kết nối sau:
+       * **Host name/address:** `postgres` (Tên service/container chạy trong cùng mạng Docker)
+       * **Port:** `5432`
+       * **Maintenance database:** `resource_allocation` (hoặc DB Name cấu hình trong `.env`)
+       * **Username:** `dev` (hoặc User cấu hình trong `.env`)
+       * **Password:** `dev123` (hoặc Password cấu hình trong `.env`)
+     * Click **Save** để kết nối và xem cấu trúc bảng.
 
 ---
 
