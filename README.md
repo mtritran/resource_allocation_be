@@ -1,14 +1,16 @@
 # Resource Allocation System (Backend)
 
-Dự án Backend quản lý phân bổ nguồn lực (Resource Allocation System) xây dựng bằng **Spring Boot 4.x** (Java 17) và **PostgreSQL**. Dự án sử dụng **Flyway** để quản lý di cư cơ sở dữ liệu và **Docker Compose** để thiết lập môi trường chạy thử nghiệm.
+> Hệ thống quản lý phân bổ nhân sự cho công ty outsourcing.  
+> Xây dựng bằng **Spring Boot 3.x** (Java 17), **PostgreSQL**, **Flyway**, **Docker Compose**.
 
 ---
 
 ## Yêu cầu hệ thống (Prerequisites)
-Trước khi chạy dự án, hãy đảm bảo máy tính của bạn đã cài đặt các công cụ sau:
+
 * **Java 17+** (JDK 17 trở lên)
-* **Docker Desktop** (để khởi chạy Database)
-* **Git** (để quản lý phiên bản)
+* **Docker Desktop** (để chạy PostgreSQL & pgAdmin)
+* **Git** (quản lý phiên bản)
+* **Node.js 18+** (nếu chạy cả FE — xem `resource_allocation_fe/README.md`)
 
 ---
 
@@ -117,15 +119,84 @@ Sau khi ứng dụng khởi động thành công, bạn có thể kiểm tra qua
 ---
 
 ## Cấu trúc thư mục chính (Key Project Structure)
+
+### Backend
 ```
 com.company.resourceallocation
-├── core                      # Chứa các module nghiệp vụ chính (Employee, Project, Allocation)
-│   ├── employee
-│   ├── project
-│   └── allocation
-├── report                    # Module xuất báo cáo
-├── ai                        # Tích hợp AI (gợi ý phân bổ / cảnh báo rủi ro)
-├── exception                 # Xử lý ngoại lệ tập trung (GlobalExceptionHandler)
-├── aspect                    # Ghi logs tự động (AOP Logging)
-└── config                    # Cấu hình OpenAPI (Swagger)
+├── core                      # Module nghiệp vụ chính
+│   ├── employee              #   Employee CRUD
+│   ├── project               #   Project CRUD
+│   └── allocation            #   Allocation (phân bổ) — business logic lõi
+├── report                    # Báo cáo (utilization, available, overloaded)
+├── ai                        # AI Bonus (Gemini integration)
+├── exception                 # GlobalExceptionHandler + custom exceptions
+├── aspect                    # AOP Logging
+└── config                    # OpenAPI / Swagger config
 ```
+
+### Frontend (riêng)
+```
+resource_allocation_fe/
+├── src/pages/
+│   ├── Dashboard.tsx
+│   ├── Employees.tsx
+│   ├── Projects.tsx
+│   ├── Allocations.tsx
+│   └── AiAssistant.tsx
+├── src/services/api.ts       # API client
+└── Backend: http://localhost:8080/api/v1
+```
+
+---
+
+## Seed Data
+
+Hệ thống tự động tạo dữ liệu mẫu qua **Flyway migration** (`V2__seed_data.sql`):
+
+| Employee | Role | Allocation |
+|---|---|---|
+| EMP001 - Nguyen Van A | Java Developer | 100% (PRJ001=60%, PRJ002=40%) |
+| EMP002 - Tran Thi B | Java Developer | 80% (PRJ001=80%) |
+| EMP003 - Le Van C | React Developer | 40% (PRJ001=40%) |
+| EMP004 - Pham Van D | DevOps Engineer | 0% |
+
+| Project | Status |
+|---|---|
+| PRJ001 - E-Commerce Platform | ACTIVE |
+| PRJ002 - Internal Dashboard | PLANNING |
+| PRJ003 - Legacy Upgrade | COMPLETED |
+
+---
+
+## Cấu hình AI (Gemini) — cho AI Bonus
+
+Nếu muốn dùng AI Bonus (recommend / risk-detection), cần set API key:
+
+```bash
+# Trên Windows PowerShell
+$env:GEMINI_API_KEY="your-gemini-api-key"
+
+# Trên Linux/macOS
+export GEMINI_API_KEY="your-gemini-api-key"
+```
+
+Hoặc thêm vào file `.env`:
+```
+GEMINI_API_KEY=your-gemini-api-key
+```
+
+> **Không có key?** AI endpoint vẫn chạy — fallback về dữ liệu thật từ database, không bị lỗi.  
+> Lấy Gemini API key miễn phí tại: https://aistudio.google.com/apikey
+
+---
+
+## Deliverables
+
+| # | File | Vị trí |
+|---|---|---|
+| 1 | Source Code Git Repository | `https://github.com/mtritran/resource_allocation_be.git` |
+| 2 | SQL Script (Flyway migration) | `src/main/resources/db/migration/V1__init_schema.sql` |
+| 3 | README.md (file này) | `README.md` |
+| 4 | Postman Collection | `deliverables/Resource_Allocation_API.postman_collection.json` |
+| 5 | API Screenshots | `deliverables/screenshots/` *(cần chụp thêm)* |
+| 6 | AI Review Report | `deliverables/AI_Review_Report.md` |
