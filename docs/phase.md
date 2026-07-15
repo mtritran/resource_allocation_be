@@ -281,10 +281,10 @@ Làm trước vì mọi module sau đều phụ thuộc vào phần này.
 
 ## Phase 6 — Reporting Module
 
-- [ ] `report/ReportService.java` — 3 method: utilization, available, overloaded (query qua `AllocationRepository`, `GROUP BY employee_id`)
-- [ ] `report/dto/UtilizationResponse.java`, `AvailableResponse.java`, `OverloadedResponse.java`
-- [ ] `report/ReportController.java` — theo `api-specs.md` mục 4.1-4.3
-- [ ] Test thủ công: seed vài data, verify số liệu report đúng với công thức ở `business-rules.md` mục 5
+- [x] `report/ReportService.java` — 3 method: utilization, available, overloaded (query qua `AllocationRepository`, `GROUP BY employee_id`)
+- [x] `report/dto/UtilizationResponse.java`, `AvailableResponse.java`, `OverloadedResponse.java`
+- [x] `report/ReportController.java` — theo `api-specs.md` mục 4.1-4.3
+- [x] Test thủ công: seed vài data, verify số liệu report đúng với công thức ở `business-rules.md` mục 5
 
 **Deliverable:** 3 report endpoint hoạt động đúng.
 

@@ -25,4 +25,13 @@ public interface AllocationRepository extends JpaRepository<Allocation, Long> {
     boolean existsByEmployeeEmployeeId(Long employeeId);
 
     boolean existsByProjectProjectId(Long projectId);
+
+    @Query(value = "SELECT e.employee_id, e.full_name, COALESCE(SUM(a.allocation_percent), 0) FROM employee e LEFT JOIN allocation a ON a.employee_id = e.employee_id GROUP BY e.employee_id, e.full_name", nativeQuery = true)
+    List<Object[]> getUtilizationReport();
+
+    @Query(value = "SELECT e.employee_id, e.full_name, (100 - COALESCE(SUM(a.allocation_percent), 0)) FROM employee e LEFT JOIN allocation a ON a.employee_id = e.employee_id GROUP BY e.employee_id, e.full_name HAVING (100 - COALESCE(SUM(a.allocation_percent), 0)) >= :minAvailable", nativeQuery = true)
+    List<Object[]> getAvailableReport(@Param("minAvailable") int minAvailable);
+
+    @Query(value = "SELECT e.employee_id, e.full_name, COALESCE(SUM(a.allocation_percent), 0) FROM employee e LEFT JOIN allocation a ON a.employee_id = e.employee_id GROUP BY e.employee_id, e.full_name HAVING COALESCE(SUM(a.allocation_percent), 0) > 90", nativeQuery = true)
+    List<Object[]> getOverloadedReport();
 }
