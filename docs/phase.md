@@ -165,7 +165,7 @@ Lộ trình chia theo phase, mỗi phase build xong nên chạy được và tes
 
 ### 0.4 Package structure + verify
 
-- [ ] Tạo package structure (tạo trước các package rỗng):
+- [x] Tạo package structure (tạo trước các package rỗng):
   ```
   com.company.resourceallocation
   ├── core
@@ -183,9 +183,9 @@ Lộ trình chia theo phase, mỗi phase build xong nên chạy được và tes
   │   └── dto
   └── config
   ```
-- [ ] Chạy `docker compose up -d` (nếu chưa chạy ở bước 0.1).
-- [ ] Start Spring Boot app → kiểm tra log thấy Flyway chạy migration `V1__init_schema.sql` thành công.
-- [ ] Verify: `GET http://localhost:8080/actuator/health` → `{"status":"UP"}` hoặc vào Swagger `http://localhost:8080/swagger-ui.html`.
+- [x] Chạy `docker compose up -d` (nếu chưa chạy ở bước 0.1).
+- [x] Start Spring Boot app → kiểm tra log thấy Flyway chạy migration `V1__init_schema.sql` thành công.
+- [x] Verify: `GET http://localhost:8080/actuator/health` → `{"status":"UP"}` hoặc vào Swagger `http://localhost:8080/swagger-ui.html`.
 
 **Deliverable:** Project chạy được, PostgreSQL + pgAdmin qua Docker Compose, schema tự động tạo qua Flyway, package structure sẵn sàng.
 
