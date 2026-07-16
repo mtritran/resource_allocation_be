@@ -2,8 +2,8 @@ package com.company.resourceallocation.ai;
 
 import com.company.resourceallocation.ai.dto.AiRecommendResponse;
 import com.company.resourceallocation.ai.dto.AiRiskResponse;
-import com.company.resourceallocation.core.employee.Employee;
-import com.company.resourceallocation.core.employee.EmployeeRepository;
+import com.company.resourceallocation.core.employee.entity.Employee;
+import com.company.resourceallocation.core.employee.repository.EmployeeRepository;
 import com.company.resourceallocation.report.ReportService;
 import com.company.resourceallocation.report.dto.AvailableResponse;
 import com.company.resourceallocation.report.dto.OverloadedResponse;

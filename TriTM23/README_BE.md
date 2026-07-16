@@ -122,8 +122,29 @@ Sau khi ứng dụng khởi động thành công, bạn có thể kiểm tra qua
 com.company.resourceallocation
 ├── core                      # Module nghiệp vụ chính
 │   ├── employee              #   Employee CRUD
+│   │   ├── controller        #     REST Controller
+│   │   ├── service           #     Business Service
+│   │   ├── repository        #     Spring Data JPA Repository
+│   │   ├── entity            #     JPA Entity
+│   │   ├── mapper            #     MapStruct Mapper
+│   │   ├── exception         #     Domain Exceptions
+│   │   └── dto               #     DTOs
 │   ├── project               #   Project CRUD
-│   └── allocation            #   Allocation (phân bổ) — business logic lõi
+│   │   ├── controller
+│   │   ├── service
+│   │   ├── repository
+│   │   ├── entity
+│   │   ├── mapper
+│   │   ├── exception
+│   │   └── dto
+│   └── allocation            #   Allocation (phân bổ)
+│       ├── controller
+│       ├── service
+│       ├── repository
+│       ├── entity
+│       ├── mapper
+│       ├── exception
+│       └── dto
 ├── report                    # Báo cáo (utilization, available, overloaded)
 ├── ai                        # AI Bonus (Gemini integration)
 ├── exception                 # GlobalExceptionHandler + custom exceptions

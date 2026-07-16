@@ -1,6 +1,6 @@
 package com.company.resourceallocation.core.project.dto;
 
-import com.company.resourceallocation.core.project.ProjectStatus;
+import com.company.resourceallocation.core.project.entity.ProjectStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;

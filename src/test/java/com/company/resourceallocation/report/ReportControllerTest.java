@@ -1,12 +1,12 @@
 package com.company.resourceallocation.report;
 
-import com.company.resourceallocation.core.allocation.Allocation;
-import com.company.resourceallocation.core.allocation.AllocationRepository;
-import com.company.resourceallocation.core.employee.Employee;
-import com.company.resourceallocation.core.employee.EmployeeRepository;
-import com.company.resourceallocation.core.project.Project;
-import com.company.resourceallocation.core.project.ProjectRepository;
-import com.company.resourceallocation.core.project.ProjectStatus;
+import com.company.resourceallocation.core.allocation.entity.Allocation;
+import com.company.resourceallocation.core.allocation.repository.AllocationRepository;
+import com.company.resourceallocation.core.employee.entity.Employee;
+import com.company.resourceallocation.core.employee.repository.EmployeeRepository;
+import com.company.resourceallocation.core.project.entity.Project;
+import com.company.resourceallocation.core.project.repository.ProjectRepository;
+import com.company.resourceallocation.core.project.entity.ProjectStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
