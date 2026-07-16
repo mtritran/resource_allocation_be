@@ -24,4 +24,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Page<Employee> findFiltered(@Param("department") String department, 
                                 @Param("role") String role, 
                                 Pageable pageable);
+
+    @Query("SELECT DISTINCT e FROM Employee e JOIN e.skills s WHERE LOWER(s.skillName) = LOWER(:skillName)")
+    java.util.List<Employee> findBySkillName(@Param("skillName") String skillName);
 }

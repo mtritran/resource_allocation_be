@@ -341,3 +341,46 @@ GET /employees/{id}/workload → totalAllocation, available, breakdown
 - Tích hợp AI thông minh với cơ chế Fallback phòng ngừa lỗi kết nối hoặc dữ liệu ảo (hallucination)
 
 *Report updated after all fixes were verified successfully — Antigravity AI*
+
+---
+
+## 10. Nhật ký Sử dụng AI Hỗ trợ Phát triển (AI-Assisted Development Logs)
+
+Dưới đây ghi nhận quá trình tương tác với trợ lý AI (Gemini/Claude) trong suốt quá trình xây dựng hệ thống, thực hiện các nâng cấp v1.5, viết kiểm thử tự động, và tài liệu hóa API.
+
+### 10.1 Nhiệm vụ 1: Sinh ca kiểm thử tự động (Generate Test Cases)
+
+*   **Prompt đã sử dụng:**
+    > "Hãy sinh các ca kiểm thử (test cases) bằng JUnit 5 và MockMvc cho Allocation API (bao gồm cả các trường hợp biên như phân bổ âm, phân bổ vượt quá 100%, phân bổ cho dự án đã COMPLETED và quy trình đổi trạng thái PENDING -> ACTIVE -> ENDED)."
+*   **AI Feedback:**
+    *   Khuyên sử dụng `@SpringBootTest` kết hợp `@AutoConfigureMockMvc` cho các kiểm thử tích hợp (integration tests).
+    *   Đưa ra các cấu trúc assert chi tiết sử dụng `jsonPath` để kiểm tra các trường trả về (như `status`, `allocationPercent`).
+    *   Gợi ý thiết lập cấu hình cơ sở dữ liệu in-memory H2 riêng biệt cho môi trường kiểm thử (`src/test/resources/application.yml`) để không làm ảnh hưởng đến cơ sở dữ liệu Postgres thực tế khi dev.
+*   **Các cải tiến đã thực hiện:**
+    *   Xây dựng đầy đủ tệp [AllocationControllerTest.java](file:///d:/Java/resource_allocation/resource_allocation_be/src/test/java/com/company/resourceallocation/core/allocation/controller/AllocationControllerTest.java) và [AllocationServiceTest.java](file:///d:/Java/resource_allocation/resource_allocation_be/src/test/java/com/company/resourceallocation/core/allocation/service/AllocationServiceTest.java).
+    *   Bổ sung các ca kiểm thử chuyển đổi trạng thái: Kiểm tra việc kích hoạt từ `PENDING` lên `ACTIVE` thành công, chặn kích hoạt nếu trạng thái hiện tại là `ENDED` hoặc `ACTIVE`, và kiểm thử kết thúc allocation (`ENDED`).
+    *   Thiết lập database H2 kiểm thử chạy độc lập hoàn hảo (`BUILD SUCCESS` 49/49 tests passed).
+
+### 10.2 Nhiệm vụ 2: Đánh giá lớp Service (Review Service Layer)
+
+*   **Prompt đã sử dụng:**
+    > "Với vai trò là một Senior Java Engineer, hãy đánh giá thiết kế của các lớp Service hiện tại (như EmployeeService, ProjectService, AllocationService) và đề xuất các điểm cải tiến về cấu trúc package, tính toàn vẹn dữ liệu và tối ưu hóa xử lý biệt lệ."
+*   **AI Feedback:**
+    *   **Layer Separation:** Đề xuất tái cấu trúc thư mục từ dạng phẳng dưới `core` thành cấu trúc phân lớp modular (ví dụ: chia nhỏ `employee` thành các package con `controller`, `service`, `repository`, `entity`, `dto`, `mapper`, `exception`) nhằm tăng tính Single Responsibility (SRP) và đóng gói tốt hơn.
+    *   **Validation & State Management:** Gợi ý lọc bỏ các phân bổ có trạng thái `ENDED` ra khỏi các phép tính dung lượng của Employee và các báo cáo (Utilization, Overloaded, Available) để phản ánh đúng khối lượng công việc hiện tại.
+*   **Các cải tiến đã thực hiện:**
+    *   Đã di chuyển toàn bộ mã nguồn `core` sang dạng package phân lớp con (`controller`, `service`, `repository`, `entity`, `dto`, `mapper`, `exception`) sạch sẽ.
+    *   Tối ưu hóa các câu lệnh truy vấn JPQL và SQL native trong `AllocationRepository` để loại bỏ các allocation có trạng thái `ENDED` ra khỏi tính toán tải lượng nhân sự, đảm bảo kết quả chính xác 100%.
+
+### 10.3 Nhiệm vụ 3: Sinh tài liệu API (Generate API Documentation)
+
+*   **Prompt đã sử dụng:**
+    > "Hãy sinh tài liệu hướng dẫn sử dụng API (API Documentation) và Swagger OpenAPI annotations dựa trên code của các lớp Controller hiện tại của dự án để tích hợp trực tiếp Swagger UI."
+*   **AI Feedback:**
+    *   Cung cấp cấu trúc OpenAPI `@Tag`, `@Operation`, `@Parameter`, `@ApiResponse` để chú thích trực quan cho từng API.
+    *   Gợi ý mô tả rõ ràng các mã lỗi HTTP có thể trả về (như 400 Bad Request cho Validation, 404 Not Found, 409 Conflict) giúp lập trình viên frontend tích hợp nhanh hơn.
+*   **Các cải tiến đã thực hiện:**
+    *   Tích hợp thư viện Springdoc OpenAPI (`springdoc-openapi-starter-webmvc-ui`).
+    *   Chú thích chi tiết tất cả các Controller (`EmployeeController`, `ProjectController`, `AllocationController`, `ReportController`, `AiController`).
+    *   Tài liệu hóa trực tiếp Swagger UI tại cổng `http://localhost:8080/swagger-ui.html`.
+

@@ -14,7 +14,7 @@ public class WorkloadResponse {
 
     Long employeeId;
     String employeeName;
-    Integer totalAllocation;
+    Integer allocated;
     Integer available;
     List<AllocationBreakdown> allocations;
 

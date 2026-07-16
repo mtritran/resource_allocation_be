@@ -5,6 +5,7 @@ import com.company.resourceallocation.core.project.exception.ProjectInUseExcepti
 import com.company.resourceallocation.core.project.exception.InvalidProjectStatusException;
 import com.company.resourceallocation.core.allocation.exception.AllocationExceededException;
 import com.company.resourceallocation.core.allocation.exception.InvalidAllocationPercentageException;
+import com.company.resourceallocation.core.allocation.exception.InvalidAllocationStatusException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             AllocationExceededException.class,
             InvalidProjectStatusException.class,
-            InvalidAllocationPercentageException.class
+            InvalidAllocationPercentageException.class,
+            InvalidAllocationStatusException.class
     })
     public ResponseEntity<ErrorResponse> handleAllocationErrors(RuntimeException ex, HttpServletRequest req) {
         return build(HttpStatus.BAD_REQUEST, ex.getMessage(), req);

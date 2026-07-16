@@ -196,4 +196,36 @@ public class AllocationControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Cannot delete employee: still has active allocations"));
     }
+
+    @Test
+    void should_manageAllocationStatusWorkflow_when_valid() throws Exception {
+        AllocationRequest req = AllocationRequest.builder()
+                .employeeId(emp.getEmployeeId())
+                .projectId(prjActive.getProjectId())
+                .allocationPercent(30)
+                .build();
+
+        String res = mockMvc.perform(post("/api/v1/allocations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("PENDING"))
+                .andReturn().getResponse().getContentAsString();
+
+        Long alcId = objectMapper.readTree(res).get("allocationId").asLong();
+
+        mockMvc.perform(put("/api/v1/allocations/" + alcId + "/activate"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("ACTIVE"));
+
+        mockMvc.perform(put("/api/v1/allocations/" + alcId + "/activate"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(put("/api/v1/allocations/" + alcId + "/end"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("ENDED"));
+
+        mockMvc.perform(put("/api/v1/allocations/" + alcId + "/activate"))
+                .andExpect(status().isBadRequest());
+    }
 }

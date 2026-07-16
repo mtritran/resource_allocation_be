@@ -8,8 +8,16 @@ import com.company.resourceallocation.core.employee.dto.WorkloadResponse;
 import com.company.resourceallocation.core.allocation.entity.Allocation;
 import com.company.resourceallocation.core.allocation.repository.AllocationRepository;
 import com.company.resourceallocation.core.employee.exception.EmployeeInUseException;
+import com.company.resourceallocation.core.skill.entity.Skill;
+import com.company.resourceallocation.core.skill.repository.SkillRepository;
+import com.company.resourceallocation.core.skill.dto.SkillResponse;
+import com.company.resourceallocation.core.skill.mapper.SkillMapper;
+import com.company.resourceallocation.core.employee.dto.EmployeeSkillSearchResponse;
 import com.company.resourceallocation.exception.DuplicateResourceException;
 import com.company.resourceallocation.exception.ResourceNotFoundException;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.AccessLevel;
@@ -27,6 +35,8 @@ public class EmployeeService {
     EmployeeRepository employeeRepository;
     EmployeeMapper employeeMapper;
     AllocationRepository allocationRepository;
+    SkillRepository skillRepository;
+    SkillMapper skillMapper;
 
     @Transactional
     public EmployeeResponse createEmployee(EmployeeRequest request) {
@@ -89,9 +99,11 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
 
-        List<Allocation> allocations = allocationRepository.findByEmployeeEmployeeId(id);
-        int totalAllocation = allocations.stream().mapToInt(Allocation::getAllocationPercent).sum();
-        int available = 100 - totalAllocation;
+        List<Allocation> allocations = allocationRepository.findByEmployeeEmployeeId(id).stream()
+                .filter(a -> a.getStatus() != com.company.resourceallocation.core.allocation.entity.AllocationStatus.ENDED)
+                .toList();
+        int allocated = allocations.stream().mapToInt(Allocation::getAllocationPercent).sum();
+        int available = 100 - allocated;
 
         List<WorkloadResponse.AllocationBreakdown> breakdown = allocations.stream()
                 .map(a -> new WorkloadResponse.AllocationBreakdown(a.getProject().getProjectCode(), a.getAllocationPercent()))
@@ -100,9 +112,54 @@ public class EmployeeService {
         return WorkloadResponse.builder()
                 .employeeId(employee.getEmployeeId())
                 .employeeName(employee.getFullName())
-                .totalAllocation(totalAllocation)
+                .allocated(allocated)
                 .available(available)
                 .allocations(breakdown)
                 .build();
+    }
+
+    @Transactional
+    public void assignSkillsToEmployee(Long employeeId, List<String> skillNames) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", employeeId));
+
+        for (String name : skillNames) {
+            if (name == null || name.trim().isEmpty()) {
+                continue;
+            }
+            String trimmedName = name.trim();
+            Skill skill = skillRepository.findBySkillNameIgnoreCase(trimmedName)
+                    .orElseGet(() -> skillRepository.save(Skill.builder().skillName(trimmedName).build()));
+            employee.getSkills().add(skill);
+        }
+        employeeRepository.save(employee);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SkillResponse> getEmployeeSkills(Long employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", employeeId));
+
+        return employee.getSkills().stream()
+                .map(skillMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<EmployeeSkillSearchResponse> searchEmployeesBySkill(String skillName) {
+        List<Employee> employees = employeeRepository.findBySkillName(skillName);
+        return employees.stream()
+                .map(emp -> {
+                    List<Allocation> allocations = allocationRepository.findByEmployeeEmployeeId(emp.getEmployeeId()).stream()
+                            .filter(a -> a.getStatus() != com.company.resourceallocation.core.allocation.entity.AllocationStatus.ENDED)
+                            .toList();
+                    int allocated = allocations.stream().mapToInt(Allocation::getAllocationPercent).sum();
+                    int available = 100 - allocated;
+                    return EmployeeSkillSearchResponse.builder()
+                            .employeeName(emp.getFullName())
+                            .available(available)
+                            .build();
+                })
+                .toList();
     }
 }

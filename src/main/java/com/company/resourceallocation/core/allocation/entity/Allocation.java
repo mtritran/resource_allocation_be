@@ -1,10 +1,6 @@
 package com.company.resourceallocation.core.allocation.entity;
 import com.company.resourceallocation.core.employee.entity.Employee;
 import com.company.resourceallocation.core.project.entity.Project;
-
-
-import com.company.resourceallocation.core.employee.entity.Employee;
-import com.company.resourceallocation.core.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -47,6 +43,11 @@ public class Allocation {
 
     @Column(name = "end_date")
     LocalDate endDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    @Builder.Default
+    AllocationStatus status = AllocationStatus.PENDING;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -12,16 +12,8 @@ import com.company.resourceallocation.core.project.entity.ProjectStatus;
 import com.company.resourceallocation.core.project.exception.InvalidProjectStatusException;
 import com.company.resourceallocation.core.allocation.exception.AllocationExceededException;
 import com.company.resourceallocation.core.allocation.exception.InvalidAllocationPercentageException;
-
-
-import com.company.resourceallocation.core.allocation.dto.AllocationRequest;
-import com.company.resourceallocation.core.allocation.dto.AllocationResponse;
-import com.company.resourceallocation.core.employee.entity.Employee;
-import com.company.resourceallocation.core.employee.repository.EmployeeRepository;
-import com.company.resourceallocation.core.project.entity.Project;
-import com.company.resourceallocation.core.project.repository.ProjectRepository;
-import com.company.resourceallocation.core.project.entity.ProjectStatus;
-import com.company.resourceallocation.core.project.exception.InvalidProjectStatusException;
+import com.company.resourceallocation.core.allocation.entity.AllocationStatus;
+import com.company.resourceallocation.core.allocation.exception.InvalidAllocationStatusException;
 import com.company.resourceallocation.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -54,6 +46,7 @@ public class AllocationService {
         Allocation allocation = allocationMapper.toEntity(request);
         allocation.setEmployee(employee);
         allocation.setProject(project);
+        allocation.setStatus(AllocationStatus.PENDING);
 
         Allocation saved = allocationRepository.save(allocation);
         return allocationMapper.toResponse(saved);
@@ -130,5 +123,32 @@ public class AllocationService {
         if (currentSum + request.getAllocationPercent() > 100) {
             throw new AllocationExceededException("Employee allocation exceeds 100%");
         }
+    }
+
+    @Transactional
+    public AllocationResponse activateAllocation(Long id) {
+        Allocation allocation = allocationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Allocation", id));
+
+        if (allocation.getStatus() == AllocationStatus.ENDED) {
+            throw new InvalidAllocationStatusException("Allocation in ENDED status cannot be activated");
+        }
+        if (allocation.getStatus() != AllocationStatus.PENDING) {
+            throw new InvalidAllocationStatusException("Only PENDING allocations can be activated");
+        }
+
+        allocation.setStatus(AllocationStatus.ACTIVE);
+        Allocation saved = allocationRepository.save(allocation);
+        return allocationMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public AllocationResponse endAllocation(Long id) {
+        Allocation allocation = allocationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Allocation", id));
+
+        allocation.setStatus(AllocationStatus.ENDED);
+        Allocation saved = allocationRepository.save(allocation);
+        return allocationMapper.toResponse(saved);
     }
 }

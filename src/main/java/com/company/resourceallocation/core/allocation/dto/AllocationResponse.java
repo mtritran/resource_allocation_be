@@ -22,5 +22,6 @@ public class AllocationResponse {
     String roleInProject;
     LocalDate startDate;
     LocalDate endDate;
+    com.company.resourceallocation.core.allocation.entity.AllocationStatus status;
     LocalDateTime createdAt;
 }

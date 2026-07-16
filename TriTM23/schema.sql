@@ -36,10 +36,23 @@ CREATE TABLE allocation (
     role_in_project     VARCHAR(100),
     start_date          DATE,
     end_date            DATE,
+    status              VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     created_at          TIMESTAMP   NOT NULL DEFAULT now(),
     updated_at          TIMESTAMP   NOT NULL DEFAULT now(),
     CONSTRAINT chk_allocation_percent CHECK (allocation_percent > 0 AND allocation_percent <= 100),
-    CONSTRAINT chk_allocation_dates CHECK (end_date IS NULL OR end_date >= start_date)
+    CONSTRAINT chk_allocation_dates CHECK (end_date IS NULL OR end_date >= start_date),
+    CONSTRAINT chk_allocation_status CHECK (status IN ('PENDING', 'ACTIVE', 'ENDED'))
+);
+
+CREATE TABLE skill (
+    skill_id    BIGSERIAL PRIMARY KEY,
+    skill_name  VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE employee_skill (
+    employee_id BIGINT NOT NULL REFERENCES employee(employee_id) ON DELETE CASCADE,
+    skill_id    BIGINT NOT NULL REFERENCES skill(skill_id) ON DELETE CASCADE,
+    PRIMARY KEY (employee_id, skill_id)
 );
 
 CREATE UNIQUE INDEX idx_employee_code ON employee(employee_code);
@@ -49,3 +62,6 @@ CREATE INDEX idx_project_status ON project(status);
 CREATE INDEX idx_allocation_employee ON allocation(employee_id);
 CREATE INDEX idx_allocation_project ON allocation(project_id);
 CREATE INDEX idx_allocation_employee_project ON allocation(employee_id, project_id);
+CREATE UNIQUE INDEX idx_skill_name ON skill(skill_name);
+CREATE INDEX idx_employee_skill_employee ON employee_skill(employee_id);
+CREATE INDEX idx_employee_skill_skill ON employee_skill(skill_id);

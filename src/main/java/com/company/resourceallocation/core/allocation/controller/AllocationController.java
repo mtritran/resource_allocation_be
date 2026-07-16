@@ -2,10 +2,6 @@ package com.company.resourceallocation.core.allocation.controller;
 import com.company.resourceallocation.core.allocation.service.AllocationService;
 import com.company.resourceallocation.core.allocation.dto.AllocationRequest;
 import com.company.resourceallocation.core.allocation.dto.AllocationResponse;
-
-
-import com.company.resourceallocation.core.allocation.dto.AllocationRequest;
-import com.company.resourceallocation.core.allocation.dto.AllocationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -70,5 +66,19 @@ public class AllocationController {
     public ResponseEntity<Void> deleteAllocation(@Parameter(description = "Allocation identifier") @PathVariable Long id) {
         allocationService.deleteAllocation(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/activate")
+    @Operation(summary = "Activate Allocation")
+    public ResponseEntity<AllocationResponse> activateAllocation(@Parameter(description = "Allocation identifier") @PathVariable Long id) {
+        AllocationResponse response = allocationService.activateAllocation(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/end")
+    @Operation(summary = "End Allocation")
+    public ResponseEntity<AllocationResponse> endAllocation(@Parameter(description = "Allocation identifier") @PathVariable Long id) {
+        AllocationResponse response = allocationService.endAllocation(id);
+        return ResponseEntity.ok(response);
     }
 }

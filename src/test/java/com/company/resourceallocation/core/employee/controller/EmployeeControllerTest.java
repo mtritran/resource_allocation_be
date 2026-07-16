@@ -184,7 +184,7 @@ public class EmployeeControllerTest {
         mockMvc.perform(get("/api/v1/employees/" + emp.getEmployeeId() + "/workload"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.employeeId").value(emp.getEmployeeId()))
-                .andExpect(jsonPath("$.totalAllocation").value(80))
+                .andExpect(jsonPath("$.allocated").value(80))
                 .andExpect(jsonPath("$.available").value(20))
                 .andExpect(jsonPath("$.allocations.length()").value(2))
                 .andExpect(jsonPath("$.allocations[0].projectCode").value("NCG"))
@@ -204,8 +204,36 @@ public class EmployeeControllerTest {
         mockMvc.perform(get("/api/v1/employees/" + emp.getEmployeeId() + "/workload"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.employeeId").value(emp.getEmployeeId()))
-                .andExpect(jsonPath("$.totalAllocation").value(0))
+                .andExpect(jsonPath("$.allocated").value(0))
                 .andExpect(jsonPath("$.available").value(100))
                 .andExpect(jsonPath("$.allocations.length()").value(0));
+    }
+
+    @Test
+    void should_assignAndGetSkills_when_valid() throws Exception {
+        Employee emp = Employee.builder()
+                .employeeCode("EMP_SKILL_1")
+                .fullName("Skill Test Employee")
+                .email("skilltest@test.com")
+                .role("Dev")
+                .build();
+        emp = employeeRepository.save(emp);
+
+        mockMvc.perform(post("/api/v1/employees/" + emp.getEmployeeId() + "/skills")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"Java\", \"Spring Boot\"]"))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/v1/employees/" + emp.getEmployeeId() + "/skills"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[?(@.skillName == 'Java')]").exists())
+                .andExpect(jsonPath("$[?(@.skillName == 'Spring Boot')]").exists());
+
+        mockMvc.perform(get("/api/v1/employees/search?skill=Java"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].employeeName").value("Skill Test Employee"))
+                .andExpect(jsonPath("$[0].available").value(100));
     }
 }

@@ -169,17 +169,17 @@ resource_allocation_fe/
 
 ## Seed Data
 
-Hệ thống tự động tạo dữ liệu mẫu qua **Flyway migration** (`V2__seed_data.sql`):
+Hệ thống tự động khởi tạo dữ liệu mẫu thông qua các script **Flyway migration** (`V2__seed_data.sql` và `V3__add_skills_and_allocation_status.sql`):
 
-| Employee | Role | Allocation |
-|---|---|---|
-| EMP001 - Nguyen Van A | Java Developer | 100% (PRJ001=60%, PRJ002=40%) |
-| EMP002 - Tran Thi B | Java Developer | 80% (PRJ001=80%) |
-| EMP003 - Le Van C | React Developer | 40% (PRJ001=40%) |
-| EMP004 - Pham Van D | DevOps Engineer | 0% |
+| Employee | Skills | Capacity Load | Allocations & Statuses |
+|---|---|---|---|
+| **EMP001 - Nguyen Van A** | Java, Spring Boot, PostgreSQL | **100%** | PRJ001 (60% `ACTIVE`), PRJ002 (40% `PENDING`) |
+| **EMP002 - Tran Thi B** | Java, Docker | **80%** | PRJ001 (80% `ACTIVE`) |
+| **EMP003 - Le Van C** | React, TypeScript | **0%** (Do đã ENDED) | PRJ001 (40% `ENDED` - Loại khỏi tải trọng) |
+| **EMP004 - Pham Van D** | Chưa gán | **0%** | Chưa phân bổ |
 
 | Project | Status |
 |---|---|
-| PRJ001 - E-Commerce Platform | ACTIVE |
-| PRJ002 - Internal Dashboard | PLANNING |
-| PRJ003 - Legacy Upgrade | COMPLETED |
+| **PRJ001 - E-Commerce Platform** | ACTIVE |
+| **PRJ002 - Internal Dashboard** | PLANNING |
+| **PRJ003 - Legacy Upgrade** | COMPLETED |

@@ -5,7 +5,10 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.company.resourceallocation.core.skill.entity.Skill;
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "employee")
@@ -36,6 +39,15 @@ public class Employee {
 
     @Column(name = "department", length = 50)
     String department;
+
+    @ManyToMany
+    @JoinTable(
+        name = "employee_skill",
+        joinColumns = @JoinColumn(name = "employee_id"),
+        inverseJoinColumns = @JoinColumn(name = "skill_id")
+    )
+    @Builder.Default
+    Set<Skill> skills = new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

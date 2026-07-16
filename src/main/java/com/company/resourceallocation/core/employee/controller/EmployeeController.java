@@ -3,11 +3,9 @@ import com.company.resourceallocation.core.employee.service.EmployeeService;
 import com.company.resourceallocation.core.employee.dto.EmployeeRequest;
 import com.company.resourceallocation.core.employee.dto.EmployeeResponse;
 import com.company.resourceallocation.core.employee.dto.WorkloadResponse;
-
-
-import com.company.resourceallocation.core.employee.dto.EmployeeRequest;
-import com.company.resourceallocation.core.employee.dto.EmployeeResponse;
-import com.company.resourceallocation.core.employee.dto.WorkloadResponse;
+import com.company.resourceallocation.core.skill.dto.SkillResponse;
+import com.company.resourceallocation.core.employee.dto.EmployeeSkillSearchResponse;
+import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -78,6 +76,30 @@ public class EmployeeController {
     @Operation(summary = "Get Employee Workload")
     public ResponseEntity<WorkloadResponse> getEmployeeWorkload(@Parameter(description = "Employee identifier") @PathVariable Long id) {
         WorkloadResponse response = employeeService.getEmployeeWorkload(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/skills")
+    @Operation(summary = "Assign Skills to Employee")
+    public ResponseEntity<Void> assignSkillsToEmployee(
+            @Parameter(description = "Employee identifier") @PathVariable Long id,
+            @RequestBody List<String> skillNames) {
+        employeeService.assignSkillsToEmployee(id, skillNames);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/{id}/skills")
+    @Operation(summary = "Get Employee Skills")
+    public ResponseEntity<List<SkillResponse>> getEmployeeSkills(@Parameter(description = "Employee identifier") @PathVariable Long id) {
+        List<SkillResponse> response = employeeService.getEmployeeSkills(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search Employees by Skill")
+    public ResponseEntity<List<EmployeeSkillSearchResponse>> searchEmployeesBySkill(
+            @Parameter(description = "Skill name") @RequestParam String skill) {
+        List<EmployeeSkillSearchResponse> response = employeeService.searchEmployeesBySkill(skill);
         return ResponseEntity.ok(response);
     }
 }
