@@ -1,4 +1,4 @@
-package com.company.resourceallocation.core.ai;
+package com.company.resourceallocation.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

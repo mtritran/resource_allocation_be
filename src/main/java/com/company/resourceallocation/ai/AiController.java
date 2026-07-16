@@ -1,8 +1,8 @@
-package com.company.resourceallocation.core.ai;
+package com.company.resourceallocation.ai;
 
-import com.company.resourceallocation.core.ai.dto.AiRecommendResponse;
-import com.company.resourceallocation.core.ai.dto.AiRequest;
-import com.company.resourceallocation.core.ai.dto.AiRiskResponse;
+import com.company.resourceallocation.ai.dto.AiRecommendResponse;
+import com.company.resourceallocation.ai.dto.AiRequest;
+import com.company.resourceallocation.ai.dto.AiRiskResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

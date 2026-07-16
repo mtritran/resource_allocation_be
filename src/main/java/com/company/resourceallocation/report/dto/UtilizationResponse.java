@@ -1,8 +1,7 @@
-package com.company.resourceallocation.core.ai.dto;
+package com.company.resourceallocation.report.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import java.util.List;
 
 @Getter
 @Setter
@@ -10,6 +9,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AiRiskResponse {
-    List<String> risks;
+public class UtilizationResponse {
+    Long employeeId;
+    String employeeName;
+    Integer totalAllocation;
 }

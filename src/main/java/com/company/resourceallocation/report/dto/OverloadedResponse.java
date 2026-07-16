@@ -1,4 +1,4 @@
-package com.company.resourceallocation.core.report.dto;
+package com.company.resourceallocation.report.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UtilizationResponse {
+public class OverloadedResponse {
     Long employeeId;
     String employeeName;
     Integer totalAllocation;

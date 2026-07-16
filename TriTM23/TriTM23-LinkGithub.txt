@@ -1,0 +1,2 @@
+Backend Repository: https://github.com/mtritran/resource_allocation_be
+Frontend Repository: https://github.com/mtritran/resource_allocation_fe

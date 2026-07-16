@@ -130,20 +130,6 @@ com.company.resourceallocation
 ├── aspect                    # AOP Logging
 └── config                    # OpenAPI / Swagger config
 ```
-
-### Frontend (riêng)
-```
-resource_allocation_fe/
-├── src/pages/
-│   ├── Dashboard.tsx
-│   ├── Employees.tsx
-│   ├── Projects.tsx
-│   ├── Allocations.tsx
-│   └── AiAssistant.tsx
-├── src/services/api.ts       # API client
-└── Backend: http://localhost:8080/api/v1
-```
-
 ---
 
 ## Seed Data

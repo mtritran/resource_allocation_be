@@ -1,4 +1,4 @@
-package com.company.resourceallocation.core.report;
+package com.company.resourceallocation.report;
 
 import com.company.resourceallocation.core.allocation.Allocation;
 import com.company.resourceallocation.core.allocation.AllocationRepository;

@@ -1,12 +1,12 @@
-package com.company.resourceallocation.core.ai;
+package com.company.resourceallocation.ai;
 
-import com.company.resourceallocation.core.ai.dto.AiRecommendResponse;
-import com.company.resourceallocation.core.ai.dto.AiRiskResponse;
+import com.company.resourceallocation.ai.dto.AiRecommendResponse;
+import com.company.resourceallocation.ai.dto.AiRiskResponse;
 import com.company.resourceallocation.core.employee.EmployeeRepository;
-import com.company.resourceallocation.core.report.ReportService;
-import com.company.resourceallocation.core.report.dto.AvailableResponse;
-import com.company.resourceallocation.core.report.dto.OverloadedResponse;
-import com.company.resourceallocation.core.report.dto.UtilizationResponse;
+import com.company.resourceallocation.report.ReportService;
+import com.company.resourceallocation.report.dto.AvailableResponse;
+import com.company.resourceallocation.report.dto.OverloadedResponse;
+import com.company.resourceallocation.report.dto.UtilizationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.experimental.FieldDefaults;

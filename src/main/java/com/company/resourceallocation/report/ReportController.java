@@ -1,8 +1,8 @@
-package com.company.resourceallocation.core.report;
+package com.company.resourceallocation.report;
 
-import com.company.resourceallocation.core.report.dto.AvailableResponse;
-import com.company.resourceallocation.core.report.dto.OverloadedResponse;
-import com.company.resourceallocation.core.report.dto.UtilizationResponse;
+import com.company.resourceallocation.report.dto.AvailableResponse;
+import com.company.resourceallocation.report.dto.OverloadedResponse;
+import com.company.resourceallocation.report.dto.UtilizationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

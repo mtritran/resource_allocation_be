@@ -1,4 +1,4 @@
-package com.company.resourceallocation.core.report.dto;
+package com.company.resourceallocation.report.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

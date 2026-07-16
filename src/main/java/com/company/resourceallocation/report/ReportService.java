@@ -1,9 +1,9 @@
-package com.company.resourceallocation.core.report;
+package com.company.resourceallocation.report;
 
 import com.company.resourceallocation.core.allocation.AllocationRepository;
-import com.company.resourceallocation.core.report.dto.AvailableResponse;
-import com.company.resourceallocation.core.report.dto.OverloadedResponse;
-import com.company.resourceallocation.core.report.dto.UtilizationResponse;
+import com.company.resourceallocation.report.dto.AvailableResponse;
+import com.company.resourceallocation.report.dto.OverloadedResponse;
+import com.company.resourceallocation.report.dto.UtilizationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.AccessLevel;
