@@ -5,6 +5,87 @@
 
 ---
 
+## Mô hình Nghiệp vụ & Thiết kế Hệ thống (Domain Model & Business Rules)
+
+### 1. Bài toán thực tế dự án giải quyết (The Core Problem)
+Đây là hệ thống Quản lý phân bổ nhân sự (Resource Allocation Management) thiết kế riêng cho mô hình các công ty Outsourcing/Gia công phần mềm hoặc Agency:
+* **Thách thức của doanh nghiệp:** Làm sao để tối ưu hóa hiệu suất làm việc của nhân viên (không để ai quá rảnh rỗi - "bench"), nhưng đồng thời không để ai bị quá tải (dẫn đến stress, nghỉ việc), và khi có dự án mới thì nhanh chóng tìm được người có kỹ năng phù hợp còn đang rảnh để đưa vào dự án.
+
+### 2. Mô hình Nghiệp vụ & Các Thực thể chính (Domain Model)
+Sự tương tác giữa các thực thể được thể hiện qua sơ đồ quan hệ dưới đây:
+
+```mermaid
+classDiagram
+    class Employee {
+        +Long employeeId
+        +String employeeCode
+        +String fullName
+        +String role
+        +String department
+        +Set~Skill~ skills
+    }
+    class Project {
+        +Long projectId
+        +String projectCode
+        +String projectName
+        +ProjectStatus status
+        +LocalDate startDate
+        +LocalDate endDate
+    }
+    class Allocation {
+        +Long allocationId
+        +Employee employee
+        +Project project
+        +Integer allocationPercent
+        +AllocationStatus status
+        +LocalDate startDate
+        +LocalDate endDate
+    }
+    class Skill {
+        +Long skillId
+        +String skillName
+    }
+    Employee "1" --* "Many" Allocation : allocated_to
+    Project "1" --* "Many" Allocation : contains
+    Employee "Many" --* "Many" Skill : possesses
+```
+* **Employee (Nhân viên):** Có kỹ năng (Skill) và thuộc về một phòng ban cụ thể.
+* **Project (Dự án):** Có vòng đời trạng thái (PLANNING ➔ ACTIVE ➔ COMPLETED).
+* **Allocation (Phân bổ - Thực thể giao dịch trung tâm):** Là cầu nối thể hiện việc Nhân viên A làm cho Dự án B với bao nhiêu phần trăm công lực (allocationPercent) trong khoảng thời gian nào.
+
+### 3. Các Quy tắc Nghiệp vụ cốt lõi (Business Rules - Trọng tâm hệ thống)
+Để tránh dữ liệu rác và sai sót vận hành, hệ thống áp dụng các luật cứng:
+* **Quy tắc Tải trọng (Max Capacity Limit):**
+  * Tổng số phần trăm phân bổ của một nhân viên trên tất cả các dự án đang chạy không được vượt quá 100%.
+  * Chỉ các phân bổ ở trạng thái PENDING hoặc ACTIVE mới chiếm dung lượng. Phân bổ đã kết thúc (ENDED) sẽ được giải phóng tải trọng về 0%.
+* **Ràng buộc trạng thái dự án (Project Status Constraint):**
+  * Không được phép phân bổ nhân viên vào một dự án đã kết thúc (COMPLETED).
+* **Ràng buộc xóa dữ liệu (Delete Safeguard):**
+  * Không được xóa Nhân viên hoặc Dự án nếu họ đang có các phân bổ chưa kết thúc.
+* **Vòng đời phân bổ (State Machine):**
+  * Phân bổ đi theo luồng một chiều: PENDING (Chờ duyệt) ➔ ACTIVE (Đang làm) ➔ ENDED (Đã rút khỏi dự án).
+  * Không cho phép quay ngược trạng thái (ví dụ: đã ENDED thì không được kích hoạt lại thành ACTIVE).
+
+### 4. Các Tính năng chính giải quyết nhiệm vụ gì? (Key Features)
+* **A. Quản lý Tải trọng thời gian thực (Workload Tracking):**
+  * **API:** `GET /api/v1/employees/{id}/workload`
+  * **Giải quyết:** Giúp Quản lý nhân sự (Resource Manager) biết nhân viên đó hiện tại đang làm những dự án nào, chiếm bao nhiêu % tải trọng (ví dụ: làm dự án A 60%, dự án B 40% = 100% overloaded) và còn bao nhiêu % rảnh rỗi để giao việc mới.
+* **B. Tìm kiếm Nhân lực thông minh theo Kỹ năng (Resource Search):**
+  * **API:** `GET /api/v1/employees/search?skill=Java`
+  * **Giải quyết:** Khi dự án mới cần lập đội (staffing), PM chỉ cần gõ tên kỹ năng. Hệ thống sẽ lọc ra các lập trình viên có kỹ năng đó kèm theo dung lượng rảnh rỗi thực tế của họ tại thời điểm đó (ví dụ: Nguyen Van A - rảnh 40%).
+* **C. Bộ báo cáo Vận hành (Operational Reports):**
+  * **API:** `/api/v1/reports/utilization`, `/api/v1/reports/available`, `/api/v1/reports/overloaded`
+  * **Giải quyết:**
+    * Báo cáo nhân viên quá tải (>90%): Để kịp thời giảm tải trước khi họ kiệt sức (burnout).
+    * Báo cáo nhân viên đang rỗi (>50% rảnh): Để nhanh chóng đào tạo hoặc điều động vào dự án mới nhằm giảm chi phí vận hành.
+* **D. Trợ lý AI hỗ trợ ra quyết định (AI Assistant - Premium feature):**
+  * **API:** `/api/v1/ai/recommend`, `/api/v1/ai/risk-detection`
+  * **Giải quyết:**
+    * Thay vì PM phải ngồi dò bảng báo cáo, PM có thể hỏi tự nhiên: "Tìm cho tôi lập trình viên Java còn rảnh trên 50%". AI sẽ phân tích DB thực tế và đề xuất người phù hợp nhất.
+    * PM hỏi: "Dự án sắp tới bắt đầu, hãy phân tích rủi ro tải lượng". AI sẽ cảnh báo: "Có 3 nhân sự chủ chốt đang gánh 100% tải, nguy cơ trễ hạn sprint là rất cao".
+
+---
+
 ## Yêu cầu hệ thống (Prerequisites)
 
 * **Java 17+** (JDK 17 trở lên)
@@ -117,7 +198,6 @@ Sau khi ứng dụng khởi động thành công, bạn có thể kiểm tra qua
 
 ## Cấu trúc thư mục chính (Key Project Structure)
 
-### Backend
 ```
 com.company.resourceallocation
 ├── core                      # Module nghiệp vụ chính
@@ -150,19 +230,6 @@ com.company.resourceallocation
 ├── exception                 # GlobalExceptionHandler + custom exceptions
 ├── aspect                    # AOP Logging
 └── config                    # OpenAPI / Swagger config
-```
-
-### Frontend (riêng)
-```
-resource_allocation_fe/
-├── src/pages/
-│   ├── Dashboard.tsx
-│   ├── Employees.tsx
-│   ├── Projects.tsx
-│   ├── Allocations.tsx
-│   └── AiAssistant.tsx
-├── src/services/api.ts       # API client
-└── Backend: http://localhost:8080/api/v1
 ```
 
 ---
