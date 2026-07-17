@@ -292,14 +292,14 @@
               "script": {
                 "exec": [
                   "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
-                  "pm.test(\"Response có employeeId, employeeName, totalAllocation, available, allocations\", () => {",
+                  "pm.test(\"Response có employeeId, employeeName, allocated, available, allocations\", () => {",
                   "  const json = pm.response.json();",
                   "  pm.expect(json).to.have.property('employeeId');",
                   "  pm.expect(json).to.have.property('employeeName');",
-                  "  pm.expect(json).to.have.property('totalAllocation');",
+                  "  pm.expect(json).to.have.property('allocated');",
                   "  pm.expect(json).to.have.property('available');",
                   "  pm.expect(json).to.have.property('allocations');",
-                  "  pm.expect(json.totalAllocation + json.available).to.eql(100);",
+                  "  pm.expect(json.allocated + json.available).to.eql(100);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -326,7 +326,7 @@
                   "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
                   "pm.test(\"Workload = 0%, available = 100%, allocations = []\", () => {",
                   "  const json = pm.response.json();",
-                  "  pm.expect(json.totalAllocation).to.eql(0);",
+                  "  pm.expect(json.allocated).to.eql(0);",
                   "  pm.expect(json.available).to.eql(100);",
                   "  pm.expect(json.allocations).to.be.empty;",
                   "});"
@@ -342,6 +342,100 @@
               "raw": "{{baseUrl}}/api/v1/employees/1/workload",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "employees", "1", "workload"]
+            }
+          }
+        },
+        {
+          "name": "1.7 Assign Employee Skills",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201 Created\", () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\"Java\", \"Spring Boot\", \"PostgreSQL\"]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees/1/skills",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees", "1", "skills"]
+            }
+          }
+        },
+        {
+          "name": "1.8 Get Employee Skills",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response is an array of skills\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('array');",
+                  "  if (json.length > 0) {",
+                  "    pm.expect(json[0]).to.have.property('skillId');",
+                  "    pm.expect(json[0]).to.have.property('skillName');",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees/1/skills",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees", "1", "skills"]
+            }
+          }
+        },
+        {
+          "name": "1.9 Search Employees by Skill",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Response is an array of employees\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.be.an('array');",
+                  "  if (json.length > 0) {",
+                  "    pm.expect(json[0]).to.have.property('employeeName');",
+                  "    pm.expect(json[0]).to.have.property('available');",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/employees/search?skill=Java",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "employees", "search"],
+              "query": [
+                { "key": "skill", "value": "Java" }
+              ]
             }
           }
         }
@@ -861,6 +955,60 @@
               "raw": "{{baseUrl}}/api/v1/allocations/1",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "allocations", "1"]
+            }
+          }
+        },
+        {
+          "name": "3.6 Activate Allocation (thay {id} = ID thật)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Status changed to ACTIVE\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('ACTIVE');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations/1/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations", "1", "activate"]
+            }
+          }
+        },
+        {
+          "name": "3.7 End Allocation (thay {id} = ID thật)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Status changed to ENDED\", () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('ENDED');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/allocations/1/end",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "allocations", "1", "end"]
             }
           }
         }
