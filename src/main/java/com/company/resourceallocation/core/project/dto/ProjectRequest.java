@@ -7,10 +7,10 @@ import java.time.LocalDate;
 
 @Builder(toBuilder = true)
 public record ProjectRequest(
-    @NotBlank(message = "Project code is required")
+    @NotBlank(message = "PROJECT_CODE_REQUIRED")
     String projectCode,
 
-    @NotBlank(message = "Project name is required")
+    @NotBlank(message = "PROJECT_NAME_REQUIRED")
     String projectName,
 
     String customer,

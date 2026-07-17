@@ -8,15 +8,15 @@ import java.time.LocalDate;
 
 @Builder(toBuilder = true)
 public record AllocationRequest(
-    @NotNull(message = "Employee ID is required")
+    @NotNull(message = "EMPLOYEE_ID_REQUIRED")
     Long employeeId,
 
-    @NotNull(message = "Project ID is required")
+    @NotNull(message = "PROJECT_ID_REQUIRED")
     Long projectId,
 
-    @NotNull(message = "Allocation percent is required")
-    @Min(value = 1, message = "Allocation percent must be at least 1")
-    @Max(value = 100, message = "Allocation percent cannot exceed 100")
+    @NotNull(message = "ALLOCATION_PERCENT_REQUIRED")
+    @Min(value = 1, message = "ALLOCATION_PERCENT_MIN_1")
+    @Max(value = 100, message = "ALLOCATION_PERCENT_MAX_100")
     Integer allocationPercent,
 
     String roleInProject,

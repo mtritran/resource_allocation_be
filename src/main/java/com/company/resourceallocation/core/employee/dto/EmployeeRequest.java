@@ -6,17 +6,17 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record EmployeeRequest(
-    @NotBlank(message = "Employee code is required")
+    @NotBlank(message = "EMPLOYEE_CODE_REQUIRED")
     String employeeCode,
 
-    @NotBlank(message = "Full name is required")
+    @NotBlank(message = "FULL_NAME_REQUIRED")
     String fullName,
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "EMAIL_REQUIRED")
+    @Email(message = "INVALID_EMAIL_FORMAT")
     String email,
 
-    @NotBlank(message = "Role is required")
+    @NotBlank(message = "ROLE_REQUIRED")
     String role,
 
     String department

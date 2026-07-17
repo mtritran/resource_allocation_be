@@ -78,7 +78,7 @@ public class EmployeeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Full name is required")));
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("FULL_NAME_REQUIRED")));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class EmployeeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Invalid email format")));
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("INVALID_EMAIL_FORMAT")));
     }
 
     @Test

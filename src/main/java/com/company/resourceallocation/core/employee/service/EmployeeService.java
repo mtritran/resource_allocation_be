@@ -9,6 +9,7 @@ import com.company.resourceallocation.core.employee.dto.WorkloadResponse;
 import com.company.resourceallocation.core.allocation.entity.Allocation;
 import com.company.resourceallocation.core.allocation.repository.AllocationRepository;
 import com.company.resourceallocation.core.employee.exception.EmployeeInUseException;
+import com.company.resourceallocation.core.employee.exception.EmployeeNotFoundException;
 import com.company.resourceallocation.core.skill.entity.Skill;
 import com.company.resourceallocation.core.skill.repository.SkillRepository;
 import com.company.resourceallocation.core.skill.dto.SkillResponse;
@@ -59,14 +60,14 @@ public class EmployeeService {
     @Transactional(readOnly = true)
     public EmployeeResponse getEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
         return employeeMapper.toResponse(employee);
     }
 
     @Transactional
     public EmployeeResponse updateEmployee(Long id, EmployeeRequest request) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
 
         if (employeeRepository.existsByEmployeeCodeAndEmployeeIdNot(request.employeeCode(), id)) {
             throw new DuplicateResourceException("Employee code " + request.employeeCode() + " already exists");
@@ -83,7 +84,7 @@ public class EmployeeService {
     @Transactional
     public void deleteEmployee(Long id) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
 
         if (allocationRepository.existsByEmployeeEmployeeId(id)) {
             throw new EmployeeInUseException("Cannot delete employee: still has active allocations");
@@ -95,7 +96,7 @@ public class EmployeeService {
     @Transactional(readOnly = true)
     public WorkloadResponse getEmployeeWorkload(Long id) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
 
         List<Allocation> allocations = allocationRepository.findByEmployeeEmployeeId(id).stream()
                 .filter(a -> a
@@ -121,7 +122,7 @@ public class EmployeeService {
     @Transactional
     public void assignSkillsToEmployee(Long employeeId, List<String> skillNames) {
         Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", employeeId));
+                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
         for (String name : skillNames) {
             if (name == null || name.trim().isEmpty()) {
@@ -138,7 +139,7 @@ public class EmployeeService {
     @Transactional(readOnly = true)
     public List<SkillResponse> getEmployeeSkills(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", employeeId));
+                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
         return employee.getSkills().stream()
                 .map(skillMapper::toResponse)

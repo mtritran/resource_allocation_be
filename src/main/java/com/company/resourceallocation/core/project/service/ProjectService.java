@@ -1,4 +1,5 @@
 package com.company.resourceallocation.core.project.service;
+
 import com.company.resourceallocation.core.project.entity.Project;
 import com.company.resourceallocation.core.project.repository.ProjectRepository;
 import com.company.resourceallocation.core.project.mapper.ProjectMapper;
@@ -6,9 +7,9 @@ import com.company.resourceallocation.core.project.dto.ProjectRequest;
 import com.company.resourceallocation.core.project.dto.ProjectResponse;
 import com.company.resourceallocation.core.project.entity.ProjectStatus;
 import com.company.resourceallocation.core.project.exception.ProjectInUseException;
+import com.company.resourceallocation.core.project.exception.ProjectNotFoundException;
 import com.company.resourceallocation.core.allocation.repository.AllocationRepository;
 import com.company.resourceallocation.exception.DuplicateResourceException;
-import com.company.resourceallocation.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.AccessLevel;
@@ -52,7 +53,7 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public ProjectResponse getProjectById(Long id) {
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Project", id));
+                .orElseThrow(() -> new ProjectNotFoundException(id));
         return projectMapper.toResponse(project);
     }
 
@@ -61,7 +62,7 @@ public class ProjectService {
         validateDates(request);
 
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Project", id));
+                .orElseThrow(() -> new ProjectNotFoundException(id));
 
         if (projectRepository.existsByProjectCodeAndProjectIdNot(request.projectCode(), id)) {
             throw new DuplicateResourceException("Project code " + request.projectCode() + " already exists");
@@ -79,7 +80,7 @@ public class ProjectService {
     @Transactional
     public void deleteProject(Long id) {
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Project", id));
+                .orElseThrow(() -> new ProjectNotFoundException(id));
 
         if (allocationRepository.existsByProjectProjectId(id)) {
             throw new ProjectInUseException("Cannot delete project: still has active allocations");
