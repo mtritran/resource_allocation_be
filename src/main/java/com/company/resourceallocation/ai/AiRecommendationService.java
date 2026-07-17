@@ -34,10 +34,10 @@ public class AiRecommendationService {
 
         String realDataContext = availableList.stream()
                 .map(a -> {
-                    String role = employeeRepository.findById(a.getEmployeeId())
+                    String role = employeeRepository.findById(a.employeeId())
                             .map(emp -> emp.getRole())
                             .orElse("N/A");
-                    return "- %s (Role: %s): available=%d%%".formatted(a.getEmployeeName(), role, a.getAvailable());
+                    return "- %s (Role: %s): available=%d%%".formatted(a.employeeName(), role, a.available());
                 })
                 .collect(Collectors.joining("\n"));
 
@@ -82,7 +82,7 @@ public class AiRecommendationService {
             }
 
             List<AiRecommendResponse.RecommendedResource> resources = availableList.stream()
-                    .filter(a -> employeeRepository.findById(a.getEmployeeId())
+                    .filter(a -> employeeRepository.findById(a.employeeId())
                             .map(emp -> {
                                 if (parsedRole != null) {
                                     return emp.getRole().toLowerCase().contains(parsedRole.toLowerCase());
@@ -90,8 +90,8 @@ public class AiRecommendationService {
                                 return emp.getFullName().toLowerCase().contains(queryClean) ||
                                        emp.getRole().toLowerCase().contains(queryClean);
                             }).orElse(false))
-                    .filter(a -> a.getAvailable() >= minAvailable)
-                    .map(a -> new AiRecommendResponse.RecommendedResource(a.getEmployeeName(), a.getAvailable()))
+                    .filter(a -> a.available() >= minAvailable)
+                    .map(a -> new AiRecommendResponse.RecommendedResource(a.employeeName(), a.available()))
                     .toList();
             return AiRecommendResponse.builder().recommendedResources(resources).build();
         }
@@ -107,18 +107,18 @@ public class AiRecommendationService {
         List<AvailableResponse> highAvailableList = reportService.getAvailableReport(50);
 
         double avgUtilization = utilizationList.isEmpty() ? 0 :
-                utilizationList.stream().mapToInt(UtilizationResponse::getTotalAllocation).average().orElse(0);
+                utilizationList.stream().mapToInt(UtilizationResponse::totalAllocation).average().orElse(0);
         int totalEmployees = utilizationList.size();
         int overloadedCount = overloadedList.size();
         int highAvailableCount = highAvailableList.size();
 
         String utilizationContext = utilizationList.stream()
-                .map(u -> "  - %s: %d%%".formatted(u.getEmployeeName(), u.getTotalAllocation()))
+                .map(u -> "  - %s: %d%%".formatted(u.employeeName(), u.totalAllocation()))
                 .collect(Collectors.joining("\n"));
 
         String overloadedContext = overloadedList.isEmpty() ? "  (không có)" :
                 overloadedList.stream()
-                        .map(o -> "  - %s: %d%%".formatted(o.getEmployeeName(), o.getTotalAllocation()))
+                        .map(o -> "  - %s: %d%%".formatted(o.employeeName(), o.totalAllocation()))
                         .collect(Collectors.joining("\n"));
 
         String prompt = """

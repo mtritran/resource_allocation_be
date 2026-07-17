@@ -67,9 +67,9 @@ public class AiRecommendationServiceTest {
         AiRecommendResponse result = aiRecommendationService.getRecommendations("Tìm Java Developer còn tối thiểu 50% available");
 
         assertNotNull(result);
-        assertEquals(1, result.getRecommendedResources().size());
-        assertEquals("Nguyen Van A", result.getRecommendedResources().get(0).getEmployee());
-        assertEquals(60, result.getRecommendedResources().get(0).getAvailable());
+        assertEquals(1, result.recommendedResources().size());
+        assertEquals("Nguyen Van A", result.recommendedResources().get(0).employee());
+        assertEquals(60, result.recommendedResources().get(0).available());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class AiRecommendationServiceTest {
         AiRecommendResponse result = aiRecommendationService.getRecommendations("Java");
 
         assertNotNull(result);
-        assertEquals(2, result.getRecommendedResources().size()); 
+        assertEquals(2, result.recommendedResources().size()); 
     }
 
     @Test
@@ -128,8 +128,8 @@ public class AiRecommendationServiceTest {
         AiRiskResponse result = aiRecommendationService.detectRisks("Sprint tới cần thêm 2 Java Developer");
 
         assertNotNull(result);
-        assertEquals(3, result.getRisks().size());
-        assertTrue(result.getRisks().get(0).contains("capacity"));
+        assertEquals(3, result.risks().size());
+        assertTrue(result.risks().get(0).contains("capacity"));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class AiRecommendationServiceTest {
         AiRiskResponse result = aiRecommendationService.detectRisks("Sprint risk analysis");
 
         assertNotNull(result);
-        assertFalse(result.getRisks().isEmpty()); 
-        assertTrue(result.getRisks().stream().anyMatch(r -> r.contains("87.5") || r.contains("overloaded") || r.contains("available")));
+        assertFalse(result.risks().isEmpty()); 
+        assertTrue(result.risks().stream().anyMatch(r -> r.contains("87.5") || r.contains("overloaded") || r.contains("available")));
     }
 }

@@ -21,14 +21,14 @@ public class AiController {
     @PostMapping("/recommend")
     @Operation(summary = "AI Resource Recommendation — trả danh sách nhân viên available phù hợp query, số liệu lấy từ database thật")
     public ResponseEntity<AiRecommendResponse> recommend(@Valid @RequestBody AiRequest request) {
-        AiRecommendResponse response = aiRecommendationService.getRecommendations(request.getQuery());
+        AiRecommendResponse response = aiRecommendationService.getRecommendations(request.query());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/risk-detection")
     @Operation(summary = "AI Risk Detection — phân tích rủi ro nhân sự dựa trên dữ liệu utilization thật")
     public ResponseEntity<AiRiskResponse> detectRisk(@Valid @RequestBody AiRequest request) {
-        AiRiskResponse response = aiRecommendationService.detectRisks(request.getQuery());
+        AiRiskResponse response = aiRecommendationService.detectRisks(request.query());
         return ResponseEntity.ok(response);
     }
 }

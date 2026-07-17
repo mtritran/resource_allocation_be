@@ -61,8 +61,8 @@ public class EmployeeControllerTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.employeeId").exists())
-                .andExpect(jsonPath("$.employeeCode").value(req.getEmployeeCode()))
-                .andExpect(jsonPath("$.email").value(req.getEmail()));
+                .andExpect(jsonPath("$.employeeCode").value(req.employeeCode()))
+                .andExpect(jsonPath("$.email").value(req.email()));
     }
 
     @Test

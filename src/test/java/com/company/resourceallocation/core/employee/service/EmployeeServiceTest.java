@@ -69,8 +69,8 @@ public class EmployeeServiceTest {
 
     @Test
     void should_createEmployeeSuccessfully_when_validRequest() {
-        when(employeeRepository.existsByEmployeeCode(request.getEmployeeCode())).thenReturn(false);
-        when(employeeRepository.existsByEmail(request.getEmail())).thenReturn(false);
+        when(employeeRepository.existsByEmployeeCode(request.employeeCode())).thenReturn(false);
+        when(employeeRepository.existsByEmail(request.email())).thenReturn(false);
         when(employeeMapper.toEntity(request)).thenReturn(employee);
         when(employeeRepository.save(employee)).thenReturn(employee);
         when(employeeMapper.toResponse(employee)).thenReturn(response);
@@ -78,13 +78,13 @@ public class EmployeeServiceTest {
         EmployeeResponse result = employeeService.createEmployee(request);
 
         assertNotNull(result);
-        assertEquals("EMP001", result.getEmployeeCode());
+        assertEquals("EMP001", result.employeeCode());
         verify(employeeRepository).save(employee);
     }
 
     @Test
     void should_throwDuplicateResourceException_when_duplicateEmployeeCode() {
-        when(employeeRepository.existsByEmployeeCode(request.getEmployeeCode())).thenReturn(true);
+        when(employeeRepository.existsByEmployeeCode(request.employeeCode())).thenReturn(true);
 
         assertThrows(DuplicateResourceException.class, () -> employeeService.createEmployee(request));
         verify(employeeRepository, never()).save(any());
@@ -92,8 +92,8 @@ public class EmployeeServiceTest {
 
     @Test
     void should_throwDuplicateResourceException_when_duplicateEmail() {
-        when(employeeRepository.existsByEmployeeCode(request.getEmployeeCode())).thenReturn(false);
-        when(employeeRepository.existsByEmail(request.getEmail())).thenReturn(true);
+        when(employeeRepository.existsByEmployeeCode(request.employeeCode())).thenReturn(false);
+        when(employeeRepository.existsByEmail(request.email())).thenReturn(true);
 
         assertThrows(DuplicateResourceException.class, () -> employeeService.createEmployee(request));
         verify(employeeRepository, never()).save(any());
@@ -109,8 +109,8 @@ public class EmployeeServiceTest {
     @Test
     void should_throwDuplicateResourceException_when_updateEmailDuplicate() {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-        when(employeeRepository.existsByEmployeeCodeAndEmployeeIdNot(request.getEmployeeCode(), 1L)).thenReturn(false);
-        when(employeeRepository.existsByEmailAndEmployeeIdNot(request.getEmail(), 1L)).thenReturn(true);
+        when(employeeRepository.existsByEmployeeCodeAndEmployeeIdNot(request.employeeCode(), 1L)).thenReturn(false);
+        when(employeeRepository.existsByEmailAndEmployeeIdNot(request.email(), 1L)).thenReturn(true);
 
         assertThrows(DuplicateResourceException.class, () -> employeeService.updateEmployee(1L, request));
     }

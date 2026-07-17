@@ -74,7 +74,7 @@ public class ProjectServiceTest {
 
     @Test
     void should_createProjectSuccessfully_when_validRequest() {
-        when(projectRepository.existsByProjectCode(request.getProjectCode())).thenReturn(false);
+        when(projectRepository.existsByProjectCode(request.projectCode())).thenReturn(false);
         when(projectMapper.toEntity(request)).thenReturn(project);
         when(projectRepository.save(project)).thenReturn(project);
         when(projectMapper.toResponse(project)).thenReturn(response);
@@ -82,13 +82,13 @@ public class ProjectServiceTest {
         ProjectResponse result = projectService.createProject(request);
 
         assertNotNull(result);
-        assertEquals("NCG", result.getProjectCode());
+        assertEquals("NCG", result.projectCode());
         verify(projectRepository).save(project);
     }
 
     @Test
     void should_throwDuplicateResourceException_when_duplicateProjectCode() {
-        when(projectRepository.existsByProjectCode(request.getProjectCode())).thenReturn(true);
+        when(projectRepository.existsByProjectCode(request.projectCode())).thenReturn(true);
 
         assertThrows(DuplicateResourceException.class, () -> projectService.createProject(request));
         verify(projectRepository, never()).save(any());
@@ -96,7 +96,7 @@ public class ProjectServiceTest {
 
     @Test
     void should_throwIllegalArgumentException_when_endDateIsBeforeStartDate() {
-        request.setEndDate(LocalDate.of(2024, 12, 31)); 
+        request = request.toBuilder().endDate(LocalDate.of(2024, 12, 31)).build(); 
 
         assertThrows(IllegalArgumentException.class, () -> projectService.createProject(request));
         verify(projectRepository, never()).save(any());
@@ -118,7 +118,7 @@ public class ProjectServiceTest {
 
         ProjectResponse result = projectService.createProject(request);
  
-         assertEquals(ProjectStatus.PLANNING, result.getStatus());
+         assertEquals(ProjectStatus.PLANNING, result.status());
      }
  
      @Test

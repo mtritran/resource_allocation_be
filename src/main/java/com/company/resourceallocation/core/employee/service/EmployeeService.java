@@ -38,11 +38,11 @@ public class EmployeeService {
 
     @Transactional
     public EmployeeResponse createEmployee(EmployeeRequest request) {
-        if (employeeRepository.existsByEmployeeCode(request.getEmployeeCode())) {
-            throw new DuplicateResourceException("Employee code " + request.getEmployeeCode() + " already exists");
+        if (employeeRepository.existsByEmployeeCode(request.employeeCode())) {
+            throw new DuplicateResourceException("Employee code " + request.employeeCode() + " already exists");
         }
-        if (employeeRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("Email " + request.getEmail() + " already exists");
+        if (employeeRepository.existsByEmail(request.email())) {
+            throw new DuplicateResourceException("Email " + request.email() + " already exists");
         }
 
         Employee employee = employeeMapper.toEntity(request);
@@ -68,11 +68,11 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
 
-        if (employeeRepository.existsByEmployeeCodeAndEmployeeIdNot(request.getEmployeeCode(), id)) {
-            throw new DuplicateResourceException("Employee code " + request.getEmployeeCode() + " already exists");
+        if (employeeRepository.existsByEmployeeCodeAndEmployeeIdNot(request.employeeCode(), id)) {
+            throw new DuplicateResourceException("Employee code " + request.employeeCode() + " already exists");
         }
-        if (employeeRepository.existsByEmailAndEmployeeIdNot(request.getEmail(), id)) {
-            throw new DuplicateResourceException("Email " + request.getEmail() + " already exists");
+        if (employeeRepository.existsByEmailAndEmployeeIdNot(request.email(), id)) {
+            throw new DuplicateResourceException("Email " + request.email() + " already exists");
         }
 
         employeeMapper.updateEntity(request, employee);

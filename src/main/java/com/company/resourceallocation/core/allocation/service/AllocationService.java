@@ -37,11 +37,11 @@ public class AllocationService {
     public AllocationResponse createAllocation(AllocationRequest request) {
         validateRequestRules(request, -1L);
 
-        Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", request.getEmployeeId()));
+        Employee employee = employeeRepository.findById(request.employeeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", request.employeeId()));
 
-        Project project = projectRepository.findById(request.getProjectId())
-                .orElseThrow(() -> new ResourceNotFoundException("Project", request.getProjectId()));
+        Project project = projectRepository.findById(request.projectId())
+                .orElseThrow(() -> new ResourceNotFoundException("Project", request.projectId()));
 
         Allocation allocation = allocationMapper.toEntity(request);
         allocation.setEmployee(employee);
@@ -72,11 +72,11 @@ public class AllocationService {
 
         validateRequestRules(request, id);
 
-        Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", request.getEmployeeId()));
+        Employee employee = employeeRepository.findById(request.employeeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", request.employeeId()));
 
-        Project project = projectRepository.findById(request.getProjectId())
-                .orElseThrow(() -> new ResourceNotFoundException("Project", request.getProjectId()));
+        Project project = projectRepository.findById(request.projectId())
+                .orElseThrow(() -> new ResourceNotFoundException("Project", request.projectId()));
 
         allocationMapper.updateEntity(request, allocation);
         allocation.setEmployee(employee);
@@ -95,28 +95,28 @@ public class AllocationService {
 
     private void validateRequestRules(AllocationRequest request, Long excludeId) {
         
-        if (request.getAllocationPercent() < 1 || request.getAllocationPercent() > 100) {
+        if (request.allocationPercent() < 1 || request.allocationPercent() > 100) {
             throw new InvalidAllocationPercentageException("Allocation percent must be between 1 and 100");
         }
 
-        if (request.getStartDate() != null && request.getEndDate() != null) {
-            if (request.getEndDate().isBefore(request.getStartDate())) {
+        if (request.startDate() != null && request.endDate() != null) {
+            if (request.endDate().isBefore(request.startDate())) {
                 throw new IllegalArgumentException("End date must be on or after start date");
             }
         }
 
-        Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", request.getEmployeeId()));
+        Employee employee = employeeRepository.findById(request.employeeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", request.employeeId()));
 
-        Project project = projectRepository.findById(request.getProjectId())
-                .orElseThrow(() -> new ResourceNotFoundException("Project", request.getProjectId()));
+        Project project = projectRepository.findById(request.projectId())
+                .orElseThrow(() -> new ResourceNotFoundException("Project", request.projectId()));
 
         if (ProjectStatus.COMPLETED.equals(project.getStatus())) {
             throw new InvalidProjectStatusException("Cannot allocate to a COMPLETED project");
         }
 
-        int currentSum = allocationRepository.sumAllocationByEmployeeExcluding(request.getEmployeeId(), excludeId);
-        if (currentSum + request.getAllocationPercent() > 100) {
+        int currentSum = allocationRepository.sumAllocationByEmployeeExcluding(request.employeeId(), excludeId);
+        if (currentSum + request.allocationPercent() > 100) {
             throw new AllocationExceededException("Employee allocation exceeds 100%");
         }
     }

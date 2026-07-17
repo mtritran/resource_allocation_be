@@ -30,8 +30,8 @@ public class ProjectService {
     public ProjectResponse createProject(ProjectRequest request) {
         validateDates(request);
 
-        if (projectRepository.existsByProjectCode(request.getProjectCode())) {
-            throw new DuplicateResourceException("Project code " + request.getProjectCode() + " already exists");
+        if (projectRepository.existsByProjectCode(request.projectCode())) {
+            throw new DuplicateResourceException("Project code " + request.projectCode() + " already exists");
         }
 
         Project project = projectMapper.toEntity(request);
@@ -63,8 +63,8 @@ public class ProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Project", id));
 
-        if (projectRepository.existsByProjectCodeAndProjectIdNot(request.getProjectCode(), id)) {
-            throw new DuplicateResourceException("Project code " + request.getProjectCode() + " already exists");
+        if (projectRepository.existsByProjectCodeAndProjectIdNot(request.projectCode(), id)) {
+            throw new DuplicateResourceException("Project code " + request.projectCode() + " already exists");
         }
 
         projectMapper.updateEntity(request, project);
@@ -89,8 +89,8 @@ public class ProjectService {
     }
 
     private void validateDates(ProjectRequest request) {
-        if (request.getStartDate() != null && request.getEndDate() != null) {
-            if (request.getEndDate().isBefore(request.getStartDate())) {
+        if (request.startDate() != null && request.endDate() != null) {
+            if (request.endDate().isBefore(request.startDate())) {
                 throw new IllegalArgumentException("End date must be on or after start date");
             }
         }

@@ -1,14 +1,8 @@
 package com.company.resourceallocation.ai.dto;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.Builder;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class AiRequest {
-    String query;
-}
+public record AiRequest(
+    String query
+) {}

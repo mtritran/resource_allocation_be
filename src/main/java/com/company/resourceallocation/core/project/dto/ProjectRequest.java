@@ -2,29 +2,22 @@ package com.company.resourceallocation.core.project.dto;
 
 import com.company.resourceallocation.core.project.entity.ProjectStatus;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.Builder;
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProjectRequest {
-
+@Builder(toBuilder = true)
+public record ProjectRequest(
     @NotBlank(message = "Project code is required")
-    String projectCode;
+    String projectCode,
 
     @NotBlank(message = "Project name is required")
-    String projectName;
+    String projectName,
 
-    String customer;
+    String customer,
 
-    LocalDate startDate;
+    LocalDate startDate,
 
-    LocalDate endDate;
+    LocalDate endDate,
 
-    ProjectStatus status;
-}
+    ProjectStatus status
+) {}

@@ -93,20 +93,20 @@ public class AllocationServiceTest {
         AllocationResponse result = allocationService.createAllocation(request);
 
         assertNotNull(result);
-        assertEquals(50, result.getAllocationPercent());
+        assertEquals(50, result.allocationPercent());
         verify(allocationRepository).save(allocation);
     }
 
     @Test
     void should_throwInvalidAllocationPercentageException_when_percentIsInvalid() {
-        request.setAllocationPercent(120);
+        request = request.toBuilder().allocationPercent(120).build();
 
         assertThrows(InvalidAllocationPercentageException.class, () -> allocationService.createAllocation(request));
     }
 
     @Test
     void should_throwIllegalArgumentException_when_endDateIsBeforeStartDate() {
-        request.setEndDate(LocalDate.of(2024, 12, 31));
+        request = request.toBuilder().endDate(LocalDate.of(2024, 12, 31)).build();
 
         assertThrows(IllegalArgumentException.class, () -> allocationService.createAllocation(request));
     }
@@ -160,6 +160,6 @@ public class AllocationServiceTest {
         Page<AllocationResponse> result = allocationService.getAllocations(1L, 2L, pageable);
 
         assertEquals(1, result.getTotalElements());
-        assertEquals(10L, result.getContent().get(0).getAllocationId());
+        assertEquals(10L, result.getContent().get(0).allocationId());
     }
 }
