@@ -19,10 +19,8 @@ public class LoggingAspect {
         String methodName = joinPoint.getSignature().getName();
         String serviceName = joinPoint.getTarget().getClass().getSimpleName();
         
-        // Derive Entity Name (e.g., EmployeeServiceImpl -> Employee, EmployeeService -> Employee)
         String entityName = serviceName.replace("ServiceImpl", "").replace("Service", "");
         
-        // Determine Action
         String action = "ACTION";
         if (methodName.startsWith("create")) {
             action = "CREATE";
@@ -35,16 +33,15 @@ public class LoggingAspect {
         try {
             Object result = joinPoint.proceed();
             
-            // Try to extract ID for logging
             String idVal = "UNKNOWN";
             if ("DELETE".equals(action)) {
-                // For delete, usually the first parameter is the ID
+                
                 Object[] args = joinPoint.getArgs();
                 if (args != null && args.length > 0) {
                     idVal = String.valueOf(args[0]);
                 }
             } else {
-                // For create/update, try to get ID from returned object (DTO or Entity)
+                
                 if (result != null) {
                     idVal = getObjectId(result, entityName);
                 }
@@ -59,7 +56,7 @@ public class LoggingAspect {
     }
 
     private String getObjectId(Object obj, String entityName) {
-        // Try getters like getEmployeeId(), getProjectId(), getAllocationId(), getId()
+        
         String[] methodNames = {
             "get" + entityName + "Id",
             "getId"

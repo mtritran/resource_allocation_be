@@ -1,9 +1,6 @@
 package com.company.resourceallocation.core.employee.mapper;
+
 import com.company.resourceallocation.core.employee.entity.Employee;
-import com.company.resourceallocation.core.employee.dto.EmployeeRequest;
-import com.company.resourceallocation.core.employee.dto.EmployeeResponse;
-
-
 import com.company.resourceallocation.core.employee.dto.EmployeeRequest;
 import com.company.resourceallocation.core.employee.dto.EmployeeResponse;
 import org.mapstruct.Mapper;

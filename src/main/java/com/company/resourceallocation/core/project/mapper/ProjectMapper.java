@@ -1,9 +1,6 @@
 package com.company.resourceallocation.core.project.mapper;
+
 import com.company.resourceallocation.core.project.entity.Project;
-import com.company.resourceallocation.core.project.dto.ProjectRequest;
-import com.company.resourceallocation.core.project.dto.ProjectResponse;
-
-
 import com.company.resourceallocation.core.project.dto.ProjectRequest;
 import com.company.resourceallocation.core.project.dto.ProjectResponse;
 import org.mapstruct.Mapper;

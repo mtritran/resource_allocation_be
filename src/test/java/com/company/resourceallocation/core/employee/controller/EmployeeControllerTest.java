@@ -1,8 +1,6 @@
 package com.company.resourceallocation.core.employee.controller;
 import com.company.resourceallocation.core.employee.repository.EmployeeRepository;
 import com.company.resourceallocation.core.employee.entity.Employee;
-
-
 import com.company.resourceallocation.core.project.entity.Project;
 import com.company.resourceallocation.core.project.repository.ProjectRepository;
 import com.company.resourceallocation.core.allocation.entity.Allocation;
@@ -113,7 +111,7 @@ public class EmployeeControllerTest {
         EmployeeRequest req = EmployeeRequest.builder()
                 .employeeCode("EMP200")
                 .fullName("Updated Name")
-                .email("original@test.com") // keep email same
+                .email("original@test.com") 
                 .role("Senior Dev")
                 .department("HR")
                 .build();

@@ -1,7 +1,5 @@
 package com.company.resourceallocation.core.employee.repository;
 import com.company.resourceallocation.core.employee.entity.Employee;
-
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

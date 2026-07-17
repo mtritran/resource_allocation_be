@@ -1,12 +1,9 @@
 package com.company.resourceallocation.core.allocation.service;
 import com.company.resourceallocation.core.allocation.exception.InvalidAllocationPercentageException;
 import com.company.resourceallocation.core.allocation.exception.AllocationExceededException;
-
 import com.company.resourceallocation.core.allocation.entity.Allocation;
 import com.company.resourceallocation.core.allocation.repository.AllocationRepository;
 import com.company.resourceallocation.core.allocation.mapper.AllocationMapper;
-
-
 import com.company.resourceallocation.core.allocation.dto.AllocationRequest;
 import com.company.resourceallocation.core.allocation.dto.AllocationResponse;
 import com.company.resourceallocation.core.employee.entity.Employee;
@@ -127,7 +124,7 @@ public class AllocationServiceTest {
     void should_throwAllocationExceededException_when_totalExceeds100() {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
         when(projectRepository.findById(2L)).thenReturn(Optional.of(project));
-        when(allocationRepository.sumAllocationByEmployeeExcluding(1L, -1L)).thenReturn(70); // 70 + 50 = 120 > 100
+        when(allocationRepository.sumAllocationByEmployeeExcluding(1L, -1L)).thenReturn(70); 
 
         assertThrows(AllocationExceededException.class, () -> allocationService.createAllocation(request));
     }

@@ -1,10 +1,7 @@
 package com.company.resourceallocation.core.project.controller;
 import com.company.resourceallocation.core.project.entity.ProjectStatus;
-
 import com.company.resourceallocation.core.project.repository.ProjectRepository;
 import com.company.resourceallocation.core.project.entity.Project;
-
-
 import com.company.resourceallocation.core.allocation.repository.AllocationRepository;
 import com.company.resourceallocation.core.project.dto.ProjectRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +49,7 @@ public class ProjectControllerTest {
                 .customer("Customer A")
                 .startDate(LocalDate.of(2025, 1, 1))
                 .endDate(LocalDate.of(2025, 6, 30))
-                .status(null) // should default to PLANNING
+                .status(null) 
                 .build();
 
         mockMvc.perform(post("/api/v1/projects")
@@ -69,7 +66,7 @@ public class ProjectControllerTest {
                 .projectCode("PRJ-ERR")
                 .projectName("Erroneous Project")
                 .startDate(LocalDate.of(2025, 6, 30))
-                .endDate(LocalDate.of(2025, 1, 1)) // before startDate
+                .endDate(LocalDate.of(2025, 1, 1)) 
                 .build();
 
         mockMvc.perform(post("/api/v1/projects")

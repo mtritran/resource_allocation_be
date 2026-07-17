@@ -75,21 +75,18 @@ public class ReportControllerTest {
                 .role("Dev")
                 .build());
 
-        // Allocate A = 100%
         allocationRepository.save(Allocation.builder()
                 .employee(empA)
                 .project(prj)
                 .allocationPercent(100)
                 .build());
 
-        // Allocate B = 80%
         allocationRepository.save(Allocation.builder()
                 .employee(empB)
                 .project(prj)
                 .allocationPercent(80)
                 .build());
 
-        // Allocate C = 40%
         allocationRepository.save(Allocation.builder()
                 .employee(empC)
                 .project(prj)
@@ -103,11 +100,11 @@ public class ReportControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3))
-                // A has 100%
+                
                 .andExpect(jsonPath("$[?(@.employeeId == " + empA.getEmployeeId() + ")].totalAllocation").value(100))
-                // B has 80%
+                
                 .andExpect(jsonPath("$[?(@.employeeId == " + empB.getEmployeeId() + ")].totalAllocation").value(80))
-                // C has 40%
+                
                 .andExpect(jsonPath("$[?(@.employeeId == " + empC.getEmployeeId() + ")].totalAllocation").value(40));
     }
 
@@ -116,12 +113,12 @@ public class ReportControllerTest {
         mockMvc.perform(get("/api/v1/reports/available")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2)) // Only B and C have available > 0
-                // B available = 20%
+                .andExpect(jsonPath("$.length()").value(2)) 
+                
                 .andExpect(jsonPath("$[?(@.employeeId == " + empB.getEmployeeId() + ")].available").value(20))
-                // C available = 60%
+                
                 .andExpect(jsonPath("$[?(@.employeeId == " + empC.getEmployeeId() + ")].available").value(60))
-                // A is not in results
+                
                 .andExpect(jsonPath("$[?(@.employeeId == " + empA.getEmployeeId() + ")]").doesNotExist());
     }
 
@@ -130,7 +127,7 @@ public class ReportControllerTest {
         mockMvc.perform(get("/api/v1/reports/available?minAvailable=50")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1)) // Only C has available = 60 >= 50
+                .andExpect(jsonPath("$.length()").value(1)) 
                 .andExpect(jsonPath("$[0].employeeId").value(empC.getEmployeeId()))
                 .andExpect(jsonPath("$[0].available").value(60));
     }
@@ -140,7 +137,7 @@ public class ReportControllerTest {
         mockMvc.perform(get("/api/v1/reports/overloaded")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1)) // Only A has allocation 100 > 90
+                .andExpect(jsonPath("$.length()").value(1)) 
                 .andExpect(jsonPath("$[0].employeeId").value(empA.getEmployeeId()))
                 .andExpect(jsonPath("$[0].totalAllocation").value(100));
     }

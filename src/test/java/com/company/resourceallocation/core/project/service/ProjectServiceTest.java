@@ -1,12 +1,9 @@
 package com.company.resourceallocation.core.project.service;
 import com.company.resourceallocation.core.project.entity.ProjectStatus;
 import com.company.resourceallocation.core.project.exception.ProjectInUseException;
-
 import com.company.resourceallocation.core.project.entity.Project;
 import com.company.resourceallocation.core.project.repository.ProjectRepository;
 import com.company.resourceallocation.core.project.mapper.ProjectMapper;
-
-
 import com.company.resourceallocation.core.project.dto.ProjectRequest;
 import com.company.resourceallocation.core.project.dto.ProjectResponse;
 import com.company.resourceallocation.core.allocation.repository.AllocationRepository;
@@ -99,7 +96,7 @@ public class ProjectServiceTest {
 
     @Test
     void should_throwIllegalArgumentException_when_endDateIsBeforeStartDate() {
-        request.setEndDate(LocalDate.of(2024, 12, 31)); // before 2025-01-01
+        request.setEndDate(LocalDate.of(2024, 12, 31)); 
 
         assertThrows(IllegalArgumentException.class, () -> projectService.createProject(request));
         verify(projectRepository, never()).save(any());

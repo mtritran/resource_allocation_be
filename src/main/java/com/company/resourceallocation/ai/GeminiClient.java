@@ -7,14 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-
 import java.util.List;
 import java.util.Map;
 
-/**
- * Thin HTTP wrapper around Gemini REST API.
- * Sends a plain-text prompt and returns the first text response.
- */
 @Component
 @Slf4j
 public class GeminiClient {
@@ -33,9 +28,6 @@ public class GeminiClient {
                 .build();
     }
 
-    /**
-     * Send a prompt to Gemini and return the plain text content of the first candidate.
-     */
     public String call(String prompt) {
         if (apiKey == null || apiKey.isBlank()) {
             log.warn("API key is not configured; throwing exception to trigger offline fallback.");

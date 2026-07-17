@@ -1,9 +1,6 @@
 package com.company.resourceallocation.core.allocation.mapper;
+
 import com.company.resourceallocation.core.allocation.entity.Allocation;
-import com.company.resourceallocation.core.allocation.dto.AllocationRequest;
-import com.company.resourceallocation.core.allocation.dto.AllocationResponse;
-
-
 import com.company.resourceallocation.core.allocation.dto.AllocationRequest;
 import com.company.resourceallocation.core.allocation.dto.AllocationResponse;
 import org.mapstruct.Mapper;

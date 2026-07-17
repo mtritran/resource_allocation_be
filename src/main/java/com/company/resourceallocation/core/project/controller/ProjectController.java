@@ -1,12 +1,9 @@
 package com.company.resourceallocation.core.project.controller;
+
 import com.company.resourceallocation.core.project.service.ProjectService;
 import com.company.resourceallocation.core.project.dto.ProjectRequest;
 import com.company.resourceallocation.core.project.dto.ProjectResponse;
 import com.company.resourceallocation.core.project.entity.ProjectStatus;
-
-
-import com.company.resourceallocation.core.project.dto.ProjectRequest;
-import com.company.resourceallocation.core.project.dto.ProjectResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,7 +32,8 @@ public class ProjectController {
             @ApiResponse(responseCode = "400", description = "Validation failed"),
             @ApiResponse(responseCode = "409", description = "Duplicate project code")
     })
-    public ResponseEntity<ProjectResponse> createProject(@Parameter(description = "Project payload") @Valid @RequestBody ProjectRequest request) {
+    public ResponseEntity<ProjectResponse> createProject(
+            @Parameter(description = "Project payload") @Valid @RequestBody ProjectRequest request) {
         ProjectResponse response = projectService.createProject(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -51,7 +49,8 @@ public class ProjectController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Project by ID")
-    public ResponseEntity<ProjectResponse> getProjectById(@Parameter(description = "Project identifier") @PathVariable Long id) {
+    public ResponseEntity<ProjectResponse> getProjectById(
+            @Parameter(description = "Project identifier") @PathVariable Long id) {
         ProjectResponse response = projectService.getProjectById(id);
         return ResponseEntity.ok(response);
     }

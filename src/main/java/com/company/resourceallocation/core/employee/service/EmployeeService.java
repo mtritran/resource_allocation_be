@@ -1,4 +1,5 @@
 package com.company.resourceallocation.core.employee.service;
+
 import com.company.resourceallocation.core.employee.entity.Employee;
 import com.company.resourceallocation.core.employee.repository.EmployeeRepository;
 import com.company.resourceallocation.core.employee.mapper.EmployeeMapper;
@@ -16,8 +17,6 @@ import com.company.resourceallocation.core.employee.dto.EmployeeSkillSearchRespo
 import com.company.resourceallocation.exception.DuplicateResourceException;
 import com.company.resourceallocation.exception.ResourceNotFoundException;
 import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.AccessLevel;
@@ -25,7 +24,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -86,11 +84,11 @@ public class EmployeeService {
     public void deleteEmployee(Long id) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
-        
+
         if (allocationRepository.existsByEmployeeEmployeeId(id)) {
             throw new EmployeeInUseException("Cannot delete employee: still has active allocations");
         }
-        
+
         employeeRepository.delete(employee);
     }
 
@@ -100,13 +98,15 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
 
         List<Allocation> allocations = allocationRepository.findByEmployeeEmployeeId(id).stream()
-                .filter(a -> a.getStatus() != com.company.resourceallocation.core.allocation.entity.AllocationStatus.ENDED)
+                .filter(a -> a
+                        .getStatus() != com.company.resourceallocation.core.allocation.entity.AllocationStatus.ENDED)
                 .toList();
         int allocated = allocations.stream().mapToInt(Allocation::getAllocationPercent).sum();
         int available = 100 - allocated;
 
         List<WorkloadResponse.AllocationBreakdown> breakdown = allocations.stream()
-                .map(a -> new WorkloadResponse.AllocationBreakdown(a.getProject().getProjectCode(), a.getAllocationPercent()))
+                .map(a -> new WorkloadResponse.AllocationBreakdown(a.getProject().getProjectCode(),
+                        a.getAllocationPercent()))
                 .toList();
 
         return WorkloadResponse.builder()
@@ -150,8 +150,10 @@ public class EmployeeService {
         List<Employee> employees = employeeRepository.findBySkillName(skillName);
         return employees.stream()
                 .map(emp -> {
-                    List<Allocation> allocations = allocationRepository.findByEmployeeEmployeeId(emp.getEmployeeId()).stream()
-                            .filter(a -> a.getStatus() != com.company.resourceallocation.core.allocation.entity.AllocationStatus.ENDED)
+                    List<Allocation> allocations = allocationRepository.findByEmployeeEmployeeId(emp.getEmployeeId())
+                            .stream()
+                            .filter(a -> a
+                                    .getStatus() != com.company.resourceallocation.core.allocation.entity.AllocationStatus.ENDED)
                             .toList();
                     int allocated = allocations.stream().mapToInt(Allocation::getAllocationPercent).sum();
                     int available = 100 - allocated;

@@ -1,8 +1,6 @@
 package com.company.resourceallocation.core.project.repository;
 import com.company.resourceallocation.core.project.entity.Project;
 import com.company.resourceallocation.core.project.entity.ProjectStatus;
-
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

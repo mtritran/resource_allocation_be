@@ -13,10 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.List;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -38,13 +36,12 @@ public class AiRecommendationServiceTest {
 
     @Test
     void should_returnRecommendedResources_when_geminiRespondsWithValidJson() {
-        // Arrange: dữ liệu thật từ database
+        
         when(reportService.getAvailableReport(1)).thenReturn(List.of(
                 new AvailableResponse(1L, "Nguyen Van A", 60),
                 new AvailableResponse(2L, "Tran Thi B", 20)
         ));
 
-        // Mock employee data for role filtering
         Employee empA = Employee.builder()
                 .employeeId(1L)
                 .fullName("Nguyen Van A")
@@ -59,7 +56,6 @@ public class AiRecommendationServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(empA));
         when(employeeRepository.findById(2L)).thenReturn(Optional.of(empB));
 
-        // Gemini trả về JSON chuẩn
         when(geminiClient.call(anyString())).thenReturn("""
                 {
                   "recommendedResources": [
@@ -68,10 +64,8 @@ public class AiRecommendationServiceTest {
                 }
                 """);
 
-        // Act
         AiRecommendResponse result = aiRecommendationService.getRecommendations("Tìm Java Developer còn tối thiểu 50% available");
 
-        // Assert
         assertNotNull(result);
         assertEquals(1, result.getRecommendedResources().size());
         assertEquals("Nguyen Van A", result.getRecommendedResources().get(0).getEmployee());
@@ -99,14 +93,12 @@ public class AiRecommendationServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(empA));
         when(employeeRepository.findById(2L)).thenReturn(Optional.of(empB));
 
-        // Gemini trả về text bình thường, không phải JSON
         when(geminiClient.call(anyString())).thenReturn("Xin chào! Tôi có thể giúp gì cho bạn?");
 
-        // Khi parse lỗi → fallback về raw data từ database
         AiRecommendResponse result = aiRecommendationService.getRecommendations("Java");
 
         assertNotNull(result);
-        assertEquals(2, result.getRecommendedResources().size()); // fallback trả tất cả available đã filter
+        assertEquals(2, result.getRecommendedResources().size()); 
     }
 
     @Test
@@ -156,7 +148,7 @@ public class AiRecommendationServiceTest {
         AiRiskResponse result = aiRecommendationService.detectRisks("Sprint risk analysis");
 
         assertNotNull(result);
-        assertFalse(result.getRisks().isEmpty()); // fallback tạo risks từ data thật
+        assertFalse(result.getRisks().isEmpty()); 
         assertTrue(result.getRisks().stream().anyMatch(r -> r.contains("87.5") || r.contains("overloaded") || r.contains("available")));
     }
 }
